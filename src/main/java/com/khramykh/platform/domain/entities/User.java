@@ -12,6 +12,8 @@ import javax.persistence.Id;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Set;
 
@@ -23,24 +25,26 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @NotNull(message = "First name cannot be null")
-    @NotEmpty(message = "First name cannot be empty")
+    @NotNull(message = "{user.firstnamenotnull}")
+    @NotEmpty(message = "{user.firstnamenotempty}")
     private String firstName;
-    @NotNull(message = "Last name cannot be null")
-    @NotEmpty(message = "Last name cannot be empty")
+    @NotNull(message = "{user.lastnamenotnull}")
+    @NotEmpty(message = "{user.lastnamenotempty}")
     private String lastName;
-    @Email(message = "Email must have correct value")
-    @NotNull(message = "Email cannot be null")
-    @NotEmpty(message = "Email cannot be empty")
+    @Email(message = "{user.incorrectemail}")
+    @NotNull(message = "{user.emailnotnull}")
+    @NotEmpty(message = "{user.emailnotempty}")
     private String email;
+    @NotNull(message = "{user.birthdaynotnull}")
     private Date birthday;
-    private Date dateOfRegistration;
+    @PastOrPresent
+    private Timestamp dateOfRegistration;
     private String photoUri;
+    @NotNull(message = "{user.gendernotnull}")
     private UserGender gender;
+    @NotNull(message = "{user.countrynotnull}")
+    @NotEmpty(message = "{user.countrynotempty}")
     private String country;
     private Set<Role> roles;
     private String hashPassword;
-
-    public User() {
-    }
 }

@@ -21,6 +21,11 @@
         <hibernate.core.version>5.3.1.Final</hibernate.core.version>
         <hibernate-jpa-2.1-api.version>1.0.2.Final</hibernate-jpa-2.1-api.version>
         <flyway.version>4.0.3</flyway.version>
+        <io.jsonwebtoken.version>0.9.1</io.jsonwebtoken.version>
+        <javax.persistence.version>1.0</javax.persistence.version>
+        <io.springfox.springfox-swagger-ui.version>3.0.0</io.springfox.springfox-swagger-ui.version>
+        <io.springfox.springfox-swagger2.version>3.0.0</io.springfox.springfox-swagger2.version>
+        <mssql-jdbc.version>8.4.1.jre8</mssql-jdbc.version>
     </properties>
 
     <dependencies>
@@ -106,18 +111,30 @@
         <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>persistence-api</artifactId>
-            <version>1.0</version>
+            <version>${javax.persistence.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
-            <version>3.0.0</version>
+            <version>${io.springfox.springfox-swagger-ui.version}</version>
         </dependency>
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
-            <version>3.0.0</version>
+            <version>${io.springfox.springfox-swagger2.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${io.jsonwebtoken.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>${mssql-jdbc.version}</version>
         </dependency>
     </dependencies>
 
@@ -130,13 +147,26 @@
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
-                <version>${flyway.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>migrate</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
-                    <user>databaseUser</user>
-                    <password>databasePassword</password>
-                    <schemas>
-                        <schema>schemaName</schema>
-                    </schemas>
+                    <driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</driver>
+                    <url>jdbc:sqlserver://localhost:1433;database=MusicPlatform</url>
+                    <user>SA</user>
+                    <password>Password_01</password>
+                    <baselineOnMigrate>true</baselineOnMigrate>
+                    <schemas>MusicPlatform</schemas>
+                    <locations>
+                        <location>
+                            classpath:/db/migration
+                        </location>
+                    </locations>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,4 +1,4 @@
-package com.khramykh.platform.api.services;
+package com.khramykh.platform.application.services;
 
 import org.springframework.stereotype.Service;
 

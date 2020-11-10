@@ -1,6 +1,6 @@
 package com.khramykh.platform.api.controllers;
 
-import com.khramykh.platform.api.services.UsersService;
+import com.khramykh.platform.application.usersApi.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
