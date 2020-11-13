@@ -86,10 +86,10 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.flywaydb</groupId>-->
+<!--            <artifactId>flyway-core</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
@@ -144,31 +144,31 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.flywaydb</groupId>
-                <artifactId>flyway-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>migrate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</driver>
-                    <url>jdbc:sqlserver://localhost:1433;database=MusicPlatform</url>
-                    <user>SA</user>
-                    <password>Password_01</password>
-                    <baselineOnMigrate>true</baselineOnMigrate>
-                    <schemas>MusicPlatform</schemas>
-                    <locations>
-                        <location>
-                            classpath:/db/migration
-                        </location>
-                    </locations>
-                </configuration>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.flywaydb</groupId>-->
+<!--                <artifactId>flyway-maven-plugin</artifactId>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>generate-sources</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>migrate</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <configuration>-->
+<!--                    <driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</driver>-->
+<!--                    <url>jdbc:sqlserver://localhost:1433;database=MusicPlatform</url>-->
+<!--                    <user>SA</user>-->
+<!--                    <password>Password_01</password>-->
+<!--                    <baselineOnMigrate>true</baselineOnMigrate>-->
+<!--                    <schemas>MusicPlatform</schemas>-->
+<!--                    <locations>-->
+<!--                        <location>-->
+<!--                            classpath:/db/migration-->
+<!--                        </location>-->
+<!--                    </locations>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 

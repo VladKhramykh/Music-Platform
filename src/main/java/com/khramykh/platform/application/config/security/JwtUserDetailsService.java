@@ -23,7 +23,7 @@ public class JwtUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("{error.user.byemailnotfound} " + email);
         }
         return new UserPrincipal(user.get());
-
-
     }
+
+
 }
