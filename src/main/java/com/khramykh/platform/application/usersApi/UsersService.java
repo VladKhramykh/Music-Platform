@@ -1,5 +1,7 @@
 package com.khramykh.platform.application.usersApi;
 
+import com.khramykh.platform.application.commons.sort.CategorySort;
+import com.khramykh.platform.application.commons.sort.UserSort;
 import com.khramykh.platform.application.exceptions.EmailAlreadyInUseException;
 import com.khramykh.platform.application.exceptions.UserNotFoundException;
 import com.khramykh.platform.application.repositories.UserRepository;
@@ -40,12 +42,8 @@ public class UsersService {
         return userRepository.findByEmailIgnoreCase(email).orElseThrow(() -> new UserNotFoundException(email));
     }
 
-    public Page<User> getUsersByPage(int pageNum, int pageSize) {
-        return userRepository.findAll(PageRequest.of(pageNum, pageSize));
-    }
-
-    public Page<User> getOldestUsersByPage(int pageNum, int pageSize, Sort sort) {
-        return userRepository.findAll(PageRequest.of(pageNum, pageSize), sort);
+    public Page<User> getUsersByPage(int pageNum, int pageSize, UserSort userSort) {
+        return userRepository.findAll(PageRequest.of(pageNum, pageSize), getSortType(userSort));
     }
 
     public void removeById(int id) {
@@ -99,13 +97,42 @@ public class UsersService {
 
     public boolean activateUser(String code) {
         Optional<User> user = userRepository.findUserByActivationCode(code);
-        if (!user.isPresent()) {
+        if (user.isEmpty()) {
             return false;
         }
         user.get().setActivationCode(null);
         userRepository.save(user.get());
 
         return true;
+    }
+
+    private Sort getSortType(UserSort userSort) {
+        switch (userSort) {
+            case ID_DESC:
+                return Sort.by("id").descending();
+            case EMAIL_ASC:
+                return Sort.by("email").ascending();
+            case EMAIL_DESC:
+                return Sort.by("email").descending();
+            case COUNTRY_ASC:
+                return Sort.by("country").ascending();
+            case COUNTRY_DESC:
+                return Sort.by("country").descending();
+            case LAST_NAME_ASC:
+                return Sort.by("lastName").ascending();
+            case LAST_NAME_DESC:
+                return Sort.by("lastName").descending();
+            case FIRST_NAME_ASC:
+                return Sort.by("firstName").ascending();
+            case FIRST_NAME_DESC:
+                return Sort.by("firstName").descending();
+            case DATE_OF_REGISTRATION_ASC:
+                return Sort.by("dateOfRegistration").ascending();
+            case DATE_OF_REGISTRATION_DESC:
+                return Sort.by("dateOfRegistration").descending();
+            default:
+                return Sort.by("id").ascending();
+        }
     }
 
     private User convertUserUpdateCommandToUser(User oldUser, UserUpdateCommand command) {

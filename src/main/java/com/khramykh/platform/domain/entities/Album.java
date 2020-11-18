@@ -4,6 +4,8 @@ import com.khramykh.platform.domain.commons.enums.AlbumTypes;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -21,7 +23,9 @@ public class Album {
     private String description;
     private AlbumTypes type;
     private String photoUri;
+    @CreatedDate
     private Date releaseDate;
+    @CreatedBy
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "artist_id", nullable = false)
     private Set<Artist> artists = new HashSet<>();

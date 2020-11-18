@@ -4,6 +4,7 @@ import com.khramykh.platform.domain.commons.enums.UserGender;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -37,6 +38,7 @@ public class User {
     @NotNull(message = "{user.birthdaynotnull}")
     private Date birthday;
     @PastOrPresent
+    @CreatedDate
     private Timestamp dateOfRegistration;
     private String photoUri;
     @NotNull(message = "{user.gendernotnull}")

@@ -3,6 +3,7 @@ package com.khramykh.platform.api.controllers;
 import com.khramykh.platform.application.categoriesApi.CategoriesService;
 import com.khramykh.platform.application.categoriesApi.commands.CategoryCreateCommand;
 import com.khramykh.platform.application.categoriesApi.commands.CategoryUpdateCommand;
+import com.khramykh.platform.application.commons.sort.CategorySort;
 import com.khramykh.platform.domain.entities.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,8 +17,8 @@ public class CategoriesController {
     CategoriesService categoriesService;
 
     @GetMapping
-    public ResponseEntity getAll(@RequestParam int pageNum, @RequestParam int pageSize) {
-        Page<Category> categoryPage = categoriesService.getCategoriesByPage(pageNum, pageSize);
+    public ResponseEntity getAll(@RequestParam int pageNum, @RequestParam int pageSize, @RequestParam CategorySort categorySort) {
+        Page<Category> categoryPage = categoriesService.getCategoriesByPage(pageNum, pageSize, categorySort);
         return ResponseEntity.ok().body(categoryPage);
     }
 
@@ -27,9 +28,9 @@ public class CategoriesController {
         return ResponseEntity.ok().body(categoryPage);
     }
 
-    @GetMapping("{name}")
-    public ResponseEntity getOneById(@PathVariable String name) {
-        Category categoryPage = categoriesService.getCategoryByName(name);
+    @GetMapping
+    public ResponseEntity getOneByName(@RequestParam String name, @RequestParam int pageNum, @RequestParam int pageSize, @RequestParam CategorySort categorySort) {
+        Page categoryPage = categoriesService.getCategoryByName(name, pageNum, pageSize, categorySort);
         return ResponseEntity.ok().body(categoryPage);
     }
 

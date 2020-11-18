@@ -1,5 +1,6 @@
 package com.khramykh.platform.api.controllers;
 
+import com.khramykh.platform.application.commons.sort.UserSort;
 import com.khramykh.platform.application.usersApi.UsersService;
 import com.khramykh.platform.application.usersApi.commands.UserRegistrationCommand;
 import com.khramykh.platform.application.usersApi.commands.UserUpdateCommand;
@@ -18,8 +19,18 @@ public class UsersController {
     @Autowired
     UsersService usersService;
 
-    //    public ResponseEntity getUsersByPage(@RequestParam int pageNum, @RequestParam int pageSize) {
-//    }
+    @GetMapping("{id}")
+    public ResponseEntity getUserById(@PathVariable int id) {
+        User foundUser = usersService.getUserById(id);
+        return ResponseEntity.ok().body(foundUser);
+    }
+
+    @GetMapping
+    public ResponseEntity getUserByPage(@RequestParam int pageNum, @RequestParam int pageSize, @RequestParam UserSort userSort) {
+        Page<User> page = usersService.getUsersByPage(pageNum, pageSize, userSort);
+        return ResponseEntity.ok().body(page);
+    }
+
     @PostMapping
     public ResponseEntity<User> create(@RequestBody UserRegistrationCommand command) {
         User created = usersService.registration(command);
@@ -41,17 +52,4 @@ public class UsersController {
             return (ResponseEntity) ResponseEntity.status(HttpStatus.FORBIDDEN);
         }
     }
-
-    @GetMapping("{id}")
-    public ResponseEntity<User> getUserById(@PathVariable int id) {
-        User foundUser = usersService.getUserById(id);
-        return ResponseEntity.ok().body(foundUser);
-    }
-
-    @GetMapping
-    public ResponseEntity<Page<User>> getUserByPage(@RequestParam int pageNum, @RequestParam int pageSize) {
-       Page<User> page = usersService.getUsersByPage(pageNum, pageSize);
-        return ResponseEntity.ok().body(page);
-    }
-
 }

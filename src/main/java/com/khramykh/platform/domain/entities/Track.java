@@ -3,6 +3,8 @@ package com.khramykh.platform.domain.entities;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -22,13 +24,15 @@ public class Track {
     private String photoUri;
     private String trackText;
     private boolean published;
+    @CreatedDate
     private Date releaseDate;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
     private Set<Category> categories = new HashSet<>();
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "album_id", nullable = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "album_id")
     private Album album;
+    @CreatedBy
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "artist_id", nullable = false)
     private Set<Artist> artists = new HashSet<>();

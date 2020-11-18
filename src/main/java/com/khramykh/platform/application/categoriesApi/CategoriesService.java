@@ -2,6 +2,7 @@ package com.khramykh.platform.application.categoriesApi;
 
 import com.khramykh.platform.application.categoriesApi.commands.CategoryCreateCommand;
 import com.khramykh.platform.application.categoriesApi.commands.CategoryUpdateCommand;
+import com.khramykh.platform.application.commons.sort.CategorySort;
 import com.khramykh.platform.application.exceptions.ResourceNotFoundException;
 import com.khramykh.platform.application.repositories.CategoryRepository;
 import com.khramykh.platform.domain.entities.Category;
@@ -20,17 +21,17 @@ public class CategoriesService {
         return categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
     }
 
-    public Category getCategoryByName(String name) {
-        return categoryRepository.findByName(name).orElseThrow(() -> new ResourceNotFoundException(name));
+    public Page<Category> getCategoryByName(String name, int pageNum, int pageSize, CategorySort categorySort) {
+        return categoryRepository.findAllByNameContaining(name, PageRequest.of(pageNum, pageSize), getSortType(categorySort));
     }
 
-    public Page<Category> getCategoriesByPage(int pageNum, int pageSize) {
-        return categoryRepository.findAll(PageRequest.of(pageNum, pageSize));
+    public Page<Category> getCategoriesByPage(int pageNum, int pageSize, CategorySort categorySort) {
+        return categoryRepository.findAll(PageRequest.of(pageNum, pageSize), getSortType(categorySort));
     }
 
     // TODO need to realize finding top-10 categories
-    public Page<Category> getMostPopularCategoriesByPage(int pageNum, int pageSize, Sort sort) {
-        return categoryRepository.findAll(PageRequest.of(pageNum, pageSize), sort);
+    public Page<Category> getMostPopularCategoriesByPage(int pageNum, int pageSize, CategorySort categorySort) {
+        return categoryRepository.findAll(PageRequest.of(pageNum, pageSize), getSortType(categorySort));
     }
 
     public void removeById(int id) {
@@ -46,17 +47,26 @@ public class CategoriesService {
         return updated;
     }
 
-    private Category convertCategoryUpdateCommandToCategory(Category oldCategory, CategoryUpdateCommand command) {
-        oldCategory.setName(command.getName());
-        oldCategory.setDescription(command.getDescription());
-        return oldCategory;
-    }
-
     public Category create(CategoryCreateCommand command) {
         Category category = new Category();
         category.setName(command.getName());
         category.setDescription(command.getDescription());
         categoryRepository.save(category);
         return category;
+    }
+
+    private Sort getSortType(CategorySort categorySort) {
+        switch (categorySort) {
+            case NAME_DESC:
+                return Sort.by("name").descending();
+            default:
+                return Sort.by("name").ascending();
+        }
+    }
+
+    private Category convertCategoryUpdateCommandToCategory(Category oldCategory, CategoryUpdateCommand command) {
+        oldCategory.setName(command.getName());
+        oldCategory.setDescription(command.getDescription());
+        return oldCategory;
     }
 }
