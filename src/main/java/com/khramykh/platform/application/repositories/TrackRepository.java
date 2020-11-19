@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface TrackRepository extends PagingAndSortingRepository<Track, Integer> {
     Page<Track> findByPublished(boolean published, Pageable pageable);
-    Page<Track> findByNameContaining(String title, Pageable pageable);
-    List<Track> findByNameContaining(String title, Sort sort);
+
+    Page<Track> findByNameContaining(String name, Pageable pageable);
 }

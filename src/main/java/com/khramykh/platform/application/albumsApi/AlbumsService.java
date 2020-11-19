@@ -23,16 +23,16 @@ public class AlbumsService {
     }
 
     public Page<Album> getAlbumByNameContaining(String name, int pageNum, int pageSize, AlbumSort albumSort) {
-        return albumsRepository.findAlbumByNameContaining(name, PageRequest.of(pageNum, pageSize), getSortType(albumSort));
+        return albumsRepository.findAlbumByNameContaining(name, PageRequest.of(pageNum, pageSize, getSortType(albumSort)));
     }
 
     public Page<Album> getAlbumsByPage(int pageNum, int pageSize, AlbumSort albumSort) {
-        return albumsRepository.findAll(PageRequest.of(pageNum, pageSize), getSortType(albumSort));
+        return albumsRepository.findAll(PageRequest.of(pageNum, pageSize, getSortType(albumSort)));
     }
 
     // TODO need to realize finding top-10 albums
     public Page<Album> getMostPopularAlbumsByPage(int pageNum, int pageSize, AlbumSort albumSort) {
-        return albumsRepository.findAll(PageRequest.of(pageNum, pageSize), getSortType(albumSort));
+        return albumsRepository.findAll(PageRequest.of(pageNum, pageSize, getSortType(albumSort)));
     }
 
     public void removeById(int id) {

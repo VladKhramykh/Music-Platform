@@ -7,11 +7,11 @@ import com.khramykh.platform.application.commons.sort.AlbumSort;
 import com.khramykh.platform.domain.entities.Album;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController("api/albums")
+@RestController
+@RequestMapping(value = "/api/albums")
 public class AlbumsController {
     @Autowired
     AlbumsService albumsService;
@@ -28,11 +28,11 @@ public class AlbumsController {
         return ResponseEntity.ok().body(albums);
     }
 
-    @GetMapping
-    public ResponseEntity getPageByName(@RequestParam String name, @RequestParam int pageNum, @RequestParam int pageSize, @RequestParam AlbumSort albumSort) {
-        Page albumPage = albumsService.getAlbumByNameContaining(name, pageNum, pageSize, albumSort);
-        return ResponseEntity.ok().body(albumPage);
-    }
+//    @GetMapping
+//    public ResponseEntity getPageByName(@RequestParam String name, @RequestParam int pageNum, @RequestParam int pageSize, @RequestParam AlbumSort albumSort) {
+//        Page albumPage = albumsService.getAlbumByNameContaining(name, pageNum, pageSize, albumSort);
+//        return ResponseEntity.ok().body(albumPage);
+//    }
 
     @DeleteMapping("{id}")
     public ResponseEntity delete(@PathVariable int id) {

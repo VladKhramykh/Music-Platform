@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/categories")
+@RequestMapping(value = "/api/categories")
 public class CategoriesController {
     @Autowired
     CategoriesService categoriesService;
@@ -28,10 +28,16 @@ public class CategoriesController {
         return ResponseEntity.ok().body(categoryPage);
     }
 
-    @GetMapping
-    public ResponseEntity getOneByName(@RequestParam String name, @RequestParam int pageNum, @RequestParam int pageSize, @RequestParam CategorySort categorySort) {
-        Page categoryPage = categoriesService.getCategoryByName(name, pageNum, pageSize, categorySort);
-        return ResponseEntity.ok().body(categoryPage);
+//    @GetMapping
+//    public ResponseEntity getOneByName(@RequestParam String name, @RequestParam int pageNum, @RequestParam int pageSize, @RequestParam CategorySort categorySort) {
+//        Page categoryPage = categoriesService.getCategoryByName(name, pageNum, pageSize, categorySort);
+//        return ResponseEntity.ok().body(categoryPage);
+//    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity delete(@PathVariable int id) {
+        categoriesService.removeById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping

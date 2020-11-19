@@ -1,4 +1,4 @@
-package com.khramykh.platform.domain.entities;
+package com.khramykh.platform.domain.commons.enums;
 
 import org.springframework.security.core.GrantedAuthority;
 

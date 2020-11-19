@@ -18,13 +18,14 @@
     <properties>
         <java.version>11</java.version>
         <flyway.plugin.version>4.0.3</flyway.plugin.version>
-        <hibernate.core.version>5.3.1.Final</hibernate.core.version>
+        <hibernate.core.version>5.4.23.Final</hibernate.core.version>
         <hibernate-jpa-2.1-api.version>1.0.2.Final</hibernate-jpa-2.1-api.version>
         <flyway.version>4.0.3</flyway.version>
         <io.jsonwebtoken.version>0.9.1</io.jsonwebtoken.version>
         <javax.persistence.version>1.0</javax.persistence.version>
         <io.springfox.springfox-swagger-ui.version>3.0.0</io.springfox.springfox-swagger-ui.version>
         <io.springfox.springfox-swagger2.version>3.0.0</io.springfox.springfox-swagger2.version>
+        <springfox-boot-starter.version>3.0.0</springfox-boot-starter.version>
         <mssql-jdbc.version>8.4.1.jre8</mssql-jdbc.version>
     </properties>
 
@@ -102,11 +103,7 @@
             <version>${hibernate.core.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.1-api</artifactId>
-            <version>${hibernate-jpa-2.1-api.version}</version>
-        </dependency>
+
 
         <dependency>
             <groupId>javax.persistence</groupId>
@@ -123,6 +120,11 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
             <version>${io.springfox.springfox-swagger2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-boot-starter</artifactId>
+            <version>${springfox-boot-starter.version}</version>
         </dependency>
 
         <dependency>

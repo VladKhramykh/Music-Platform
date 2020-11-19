@@ -1,8 +1,11 @@
 package com.khramykh.platform.domain.entities;
 
+import com.khramykh.platform.domain.commons.enums.Country;
+import com.khramykh.platform.domain.commons.enums.Role;
 import com.khramykh.platform.domain.commons.enums.UserGender;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -16,14 +19,13 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+@Table(name = "users")
+public class User extends BaseEntity {
     @NotNull(message = "{user.firstnamenotnull}")
     @NotEmpty(message = "{user.firstnamenotempty}")
     private String firstName;
@@ -42,11 +44,12 @@ public class User {
     private Timestamp dateOfRegistration;
     private String photoUri;
     @NotNull(message = "{user.gendernotnull}")
+    @Enumerated(EnumType.STRING)
     private UserGender gender;
     @NotNull(message = "{user.countrynotnull}")
     @NotEmpty(message = "{user.countrynotempty}")
-    private String country;
-
+    @Enumerated(EnumType.STRING)
+    private Country country;
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)

@@ -22,16 +22,16 @@ public class ArtistsService {
     }
 
     public Page<Artist> getArtistByName(String name, int pageNum, int pageSize, ArtistSort artistSort) {
-        return artistsRepository.findAllByNameContaining(name, PageRequest.of(pageNum, pageSize), getSortType(artistSort));
+        return artistsRepository.findByNameContaining(name, PageRequest.of(pageNum, pageSize, getSortType(artistSort)));
     }
 
     public Page<Artist> getArtistsByPage(int pageNum, int pageSize, ArtistSort artistSort) {
-        return artistsRepository.findAll(PageRequest.of(pageNum, pageSize), getSortType(artistSort));
+        return artistsRepository.findAll(PageRequest.of(pageNum, pageSize, getSortType(artistSort)));
     }
 
     // TODO need to realize finding top-10 artists
     public Page<Artist> getMostPopularArtistsByPage(int pageNum, int pageSize, ArtistSort artistSort) {
-        return artistsRepository.findAll(PageRequest.of(pageNum, pageSize), getSortType(artistSort));
+        return artistsRepository.findAll(PageRequest.of(pageNum, pageSize, getSortType(artistSort)));
     }
 
     public void removeById(int id) {

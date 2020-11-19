@@ -13,9 +13,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping(value = "/api/users")
 public class UsersController {
-
     @Autowired
     UsersService usersService;
 
@@ -26,10 +25,16 @@ public class UsersController {
     }
 
     @GetMapping
-    public ResponseEntity getUserByPage(@RequestParam int pageNum, @RequestParam int pageSize, @RequestParam UserSort userSort) {
+    public ResponseEntity getUsersByPage(@RequestParam int pageNum, @RequestParam int pageSize, @RequestParam UserSort userSort) {
         Page<User> page = usersService.getUsersByPage(pageNum, pageSize, userSort);
         return ResponseEntity.ok().body(page);
     }
+//
+//    @GetMapping
+//    public ResponseEntity getUserByEmail(@RequestParam String email) {
+//        User page = usersService.getUserByEmail(email);
+//        return ResponseEntity.ok().body(page);
+//    }
 
     @PostMapping
     public ResponseEntity<User> create(@RequestBody UserRegistrationCommand command) {

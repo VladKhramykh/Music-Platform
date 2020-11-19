@@ -1,20 +1,19 @@
 package com.khramykh.platform.application.usersApi;
 
-import com.khramykh.platform.application.commons.sort.CategorySort;
 import com.khramykh.platform.application.commons.sort.UserSort;
 import com.khramykh.platform.application.exceptions.EmailAlreadyInUseException;
 import com.khramykh.platform.application.exceptions.UserNotFoundException;
 import com.khramykh.platform.application.repositories.UserRepository;
 import com.khramykh.platform.application.usersApi.commands.UserRegistrationCommand;
 import com.khramykh.platform.application.usersApi.commands.UserUpdateCommand;
-import com.khramykh.platform.domain.entities.Role;
+import com.khramykh.platform.domain.commons.enums.Country;
+import com.khramykh.platform.domain.commons.enums.Role;
 import com.khramykh.platform.domain.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.mail.MailSender;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -43,7 +42,7 @@ public class UsersService {
     }
 
     public Page<User> getUsersByPage(int pageNum, int pageSize, UserSort userSort) {
-        return userRepository.findAll(PageRequest.of(pageNum, pageSize), getSortType(userSort));
+        return userRepository.findAll(PageRequest.of(pageNum, pageSize, getSortType(userSort)));
     }
 
     public void removeById(int id) {
@@ -142,7 +141,7 @@ public class UsersService {
             oldUser.setActivationCode(UUID.randomUUID().toString());
         }
         oldUser.setBirthday(command.getBirthday());
-        oldUser.setCountry(command.getCountry());
+        oldUser.setCountry(Country.valueOf(command.getCountry()));
         oldUser.setPhotoUri(command.getPhotoUri());
         oldUser.setHashPassword(command.getPassword());
         oldUser.setGender(command.getGender());

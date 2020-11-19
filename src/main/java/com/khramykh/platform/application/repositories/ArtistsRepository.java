@@ -6,5 +6,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 public interface ArtistsRepository extends PagingAndSortingRepository<Artist, Integer> {
-    Page<Artist> findAllByNameContaining(String name, Pageable pageable, Sort sort);
+    Page<Artist> findByNameContaining(String name, Pageable pageable);
 }

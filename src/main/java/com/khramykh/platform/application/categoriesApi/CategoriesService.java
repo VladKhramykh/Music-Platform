@@ -22,16 +22,16 @@ public class CategoriesService {
     }
 
     public Page<Category> getCategoryByName(String name, int pageNum, int pageSize, CategorySort categorySort) {
-        return categoryRepository.findAllByNameContaining(name, PageRequest.of(pageNum, pageSize), getSortType(categorySort));
+        return categoryRepository.findByNameContaining(name, PageRequest.of(pageNum, pageSize, getSortType(categorySort)));
     }
 
     public Page<Category> getCategoriesByPage(int pageNum, int pageSize, CategorySort categorySort) {
-        return categoryRepository.findAll(PageRequest.of(pageNum, pageSize), getSortType(categorySort));
+        return categoryRepository.findAll(PageRequest.of(pageNum, pageSize, getSortType(categorySort)));
     }
 
     // TODO need to realize finding top-10 categories
     public Page<Category> getMostPopularCategoriesByPage(int pageNum, int pageSize, CategorySort categorySort) {
-        return categoryRepository.findAll(PageRequest.of(pageNum, pageSize), getSortType(categorySort));
+        return categoryRepository.findAll(PageRequest.of(pageNum, pageSize, getSortType(categorySort)));
     }
 
     public void removeById(int id) {

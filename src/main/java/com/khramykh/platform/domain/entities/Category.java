@@ -2,13 +2,18 @@ package com.khramykh.platform.domain.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
+
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Category {
-    private int id;
+@Entity
+@Table(name = "track_categories")
+public class Category extends BaseEntity{
     private String name;
     private String description;
 }
