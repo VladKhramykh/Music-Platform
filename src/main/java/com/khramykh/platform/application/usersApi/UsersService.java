@@ -8,6 +8,7 @@ import com.khramykh.platform.application.usersApi.commands.UserRegistrationComma
 import com.khramykh.platform.application.usersApi.commands.UserUpdateCommand;
 import com.khramykh.platform.domain.commons.enums.Country;
 import com.khramykh.platform.domain.commons.enums.Role;
+import com.khramykh.platform.domain.commons.enums.UserGender;
 import com.khramykh.platform.domain.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.sql.Date;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
@@ -72,6 +74,10 @@ public class UsersService {
         user.setFirstName(command.getFirstName());
         user.setLastName(command.getLastName());
         user.setEmail(command.getEmail());
+        // TODO need to fix date persing (maybe need to change type of birthday)
+        user.setBirthday(Date.valueOf(command.getBirthday()));
+        user.setGender(UserGender.valueOf(command.getGender()));
+        user.setCountry(Country.valueOf(command.getCountry()));
         user.setActivationCode(UUID.randomUUID().toString());
         user.setHashPassword(passwordEncoder.encode(command.getPassword()));
         user.setRoles(Collections.singleton(Role.USER));

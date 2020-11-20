@@ -47,7 +47,6 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserGender gender;
     @NotNull(message = "{user.countrynotnull}")
-    @NotEmpty(message = "{user.countrynotempty}")
     @Enumerated(EnumType.STRING)
     private Country country;
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)

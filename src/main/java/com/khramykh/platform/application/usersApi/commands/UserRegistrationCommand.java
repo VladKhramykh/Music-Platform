@@ -1,11 +1,8 @@
 package com.khramykh.platform.application.usersApi.commands;
 
-import com.khramykh.platform.domain.commons.enums.UserGender;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -14,9 +11,9 @@ public class UserRegistrationCommand {
     private String firstName;
     private String lastName;
     private String email;
-    private Date birthday;
+    private String birthday;
     private String photoUri;
-    private UserGender gender;
+    private String gender;
     private String country;
     private String password;
 }
