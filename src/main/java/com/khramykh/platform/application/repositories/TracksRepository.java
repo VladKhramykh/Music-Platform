@@ -7,7 +7,7 @@ import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
-public interface TrackRepository extends PagingAndSortingRepository<Track, Integer> {
+public interface TracksRepository extends PagingAndSortingRepository<Track, Integer> {
     Page<Track> findByPublished(boolean published, Pageable pageable);
 
     Page<Track> findByNameContaining(String name, Pageable pageable);

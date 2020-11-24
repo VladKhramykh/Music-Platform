@@ -1,7 +1,7 @@
-package com.khramykh.platform.api.utils;
+package com.khramykh.platform.api.commons;
 
-import com.khramykh.platform.api.commons.ApiErrorResponse;
 import com.khramykh.platform.application.exceptions.EmailAlreadyInUseException;
+import com.khramykh.platform.application.exceptions.ResourceNotFoundException;
 import com.khramykh.platform.application.exceptions.TrackNotFoundException;
 import com.khramykh.platform.application.exceptions.UserNotFoundException;
 import org.springframework.context.annotation.PropertySource;
@@ -56,6 +56,15 @@ public class ApiExceptionsHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleResourceNotFoundApiException(ResourceNotFoundException ex) {
+        ApiErrorResponse response = new ApiErrorResponse();
+        response.setMsg(ex.getMsg());
+
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
+    @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,
             HttpHeaders headers,

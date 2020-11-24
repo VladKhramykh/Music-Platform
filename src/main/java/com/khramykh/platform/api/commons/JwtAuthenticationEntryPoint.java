@@ -1,4 +1,4 @@
-package com.khramykh.platform.api.utils;
+package com.khramykh.platform.api.commons;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;

@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+
 @RestController
 @RequestMapping(value = "/api/albums")
 public class AlbumsController {
@@ -28,6 +30,18 @@ public class AlbumsController {
         return ResponseEntity.ok().body(albums);
     }
 
+    @GetMapping("/like")
+    public ResponseEntity like(@RequestParam int trackId, @RequestParam int userId) {
+        albumsService.like(trackId, userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/dislike")
+    public ResponseEntity dislike(@RequestParam int trackId, @RequestParam int userId) {
+        albumsService.dislike(trackId, userId);
+        return ResponseEntity.ok().build();
+    }
+
 //    @GetMapping
 //    public ResponseEntity getPageByName(@RequestParam String name, @RequestParam int pageNum, @RequestParam int pageSize, @RequestParam AlbumSort albumSort) {
 //        Page albumPage = albumsService.getAlbumByNameContaining(name, pageNum, pageSize, albumSort);
@@ -41,13 +55,13 @@ public class AlbumsController {
     }
 
     @PutMapping
-    public ResponseEntity update(@RequestBody AlbumUpdateCommand command) {
+    public ResponseEntity update(@RequestBody AlbumUpdateCommand command) throws ParseException {
         Album updated = albumsService.update(command);
         return ResponseEntity.ok().body(updated);
     }
 
     @PostMapping
-    public ResponseEntity create(@RequestBody AlbumCreateCommand command) {
+    public ResponseEntity create(@RequestBody AlbumCreateCommand command) throws ParseException {
         Album created = albumsService.create(command);
         return ResponseEntity.ok().body(created);
     }

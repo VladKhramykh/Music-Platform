@@ -15,9 +15,9 @@ public class UserUpdateCommand {
     private String firstName;
     private String lastName;
     private String email;
-    private Date birthday;
+    private String birthday;
     private String photoUri;
-    private UserGender gender;
+    private String gender;
     private String country;
     private String password;
 }

@@ -3,7 +3,7 @@ package com.khramykh.platform.application.usersApi;
 import com.khramykh.platform.application.commons.sort.UserSort;
 import com.khramykh.platform.application.exceptions.EmailAlreadyInUseException;
 import com.khramykh.platform.application.exceptions.UserNotFoundException;
-import com.khramykh.platform.application.repositories.UserRepository;
+import com.khramykh.platform.application.repositories.UsersRepository;
 import com.khramykh.platform.application.usersApi.commands.UserRegistrationCommand;
 import com.khramykh.platform.application.usersApi.commands.UserUpdateCommand;
 import com.khramykh.platform.domain.commons.enums.Country;
@@ -19,7 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,7 +28,7 @@ import java.util.UUID;
 @Service
 public class UsersService {
     @Autowired
-    UserRepository userRepository;
+    UsersRepository usersRepository;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -36,36 +37,36 @@ public class UsersService {
     private MailSender mailSender;
 
     public User getUserById(int id) {
-        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        return usersRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
     }
 
     public User getUserByEmail(String email) {
-        return userRepository.findByEmailIgnoreCase(email).orElseThrow(() -> new UserNotFoundException(email));
+        return usersRepository.findByEmailIgnoreCase(email).orElseThrow(() -> new UserNotFoundException(email));
     }
 
     public Page<User> getUsersByPage(int pageNum, int pageSize, UserSort userSort) {
-        return userRepository.findAll(PageRequest.of(pageNum, pageSize, getSortType(userSort)));
+        return usersRepository.findAll(PageRequest.of(pageNum, pageSize, getSortType(userSort)));
     }
 
     public void removeById(int id) {
-        if (!userRepository.existsById(id)) {
+        if (!usersRepository.existsById(id)) {
             throw new UserNotFoundException(id);
         }
-        userRepository.deleteById(id);
+        usersRepository.deleteById(id);
     }
 
-    public User update(UserUpdateCommand command) {
-        User oldUser = userRepository.findById(command.getId()).orElseThrow(() -> new UserNotFoundException(command.getId()));
-        User updated = userRepository.save(convertUserUpdateCommandToUser(oldUser, command));
+    public User update(UserUpdateCommand command) throws ParseException {
+        User oldUser = usersRepository.findById(command.getId()).orElseThrow(() -> new UserNotFoundException(command.getId()));
+        User updated = usersRepository.save(convertUserUpdateCommandToUser(oldUser, command));
         return updated;
     }
 
     private boolean isExistsByEmail(String email) {
-        Optional<User> user = userRepository.findByEmailIgnoreCase(email);
+        Optional<User> user = usersRepository.findByEmailIgnoreCase(email);
         return user.isPresent();
     }
 
-    public User registration(UserRegistrationCommand command) {
+    public User registration(UserRegistrationCommand command) throws ParseException {
         if (isExistsByEmail(command.getEmail())) {
             throw new EmailAlreadyInUseException("There is an account with that email adress: " + command.getEmail());
         }
@@ -75,7 +76,7 @@ public class UsersService {
         user.setLastName(command.getLastName());
         user.setEmail(command.getEmail());
         // TODO need to fix date persing (maybe need to change type of birthday)
-        user.setBirthday(Date.valueOf(command.getBirthday()));
+        user.setBirthday(new SimpleDateFormat("dd/MM/yyyy").parse(command.getBirthday()));
         user.setGender(UserGender.valueOf(command.getGender()));
         user.setCountry(Country.valueOf(command.getCountry()));
         user.setActivationCode(UUID.randomUUID().toString());
@@ -84,7 +85,7 @@ public class UsersService {
 
         new Thread(() -> sendActivationCode(user)).start();
 
-        return userRepository.save(user);
+        return usersRepository.save(user);
     }
 
     private void sendActivationCode(User user) {
@@ -101,12 +102,12 @@ public class UsersService {
     }
 
     public boolean activateUser(String code) {
-        Optional<User> user = userRepository.findUserByActivationCode(code);
+        Optional<User> user = usersRepository.findUserByActivationCode(code);
         if (user.isEmpty()) {
             return false;
         }
         user.get().setActivationCode(null);
-        userRepository.save(user.get());
+        usersRepository.save(user.get());
 
         return true;
     }
@@ -140,17 +141,17 @@ public class UsersService {
         }
     }
 
-    private User convertUserUpdateCommandToUser(User oldUser, UserUpdateCommand command) {
+    private User convertUserUpdateCommandToUser(User oldUser, UserUpdateCommand command) throws ParseException {
         oldUser.setFirstName(command.getFirstName());
         oldUser.setLastName(command.getLastName());
         if (!oldUser.getEmail().equals(command.getEmail())) {
             oldUser.setActivationCode(UUID.randomUUID().toString());
         }
-        oldUser.setBirthday(command.getBirthday());
+        oldUser.setBirthday(new SimpleDateFormat("dd/MM/yyyy").parse(command.getBirthday()));
         oldUser.setCountry(Country.valueOf(command.getCountry()));
         oldUser.setPhotoUri(command.getPhotoUri());
         oldUser.setHashPassword(command.getPassword());
-        oldUser.setGender(command.getGender());
+        oldUser.setGender(UserGender.valueOf(command.getGender()));
 
         return oldUser;
     }

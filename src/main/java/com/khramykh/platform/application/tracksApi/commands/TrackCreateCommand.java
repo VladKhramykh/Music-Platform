@@ -1,6 +1,5 @@
 package com.khramykh.platform.application.tracksApi.commands;
 
-import com.khramykh.platform.domain.commons.enums.TrackTypes;
 import com.khramykh.platform.domain.entities.Album;
 import com.khramykh.platform.domain.entities.Artist;
 import com.khramykh.platform.domain.entities.Category;
@@ -16,7 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class TrackCreateCommand {
     private String name;
-    private TrackTypes type;
+    private String type;
     private String description;
     private String photoUri;
     private String trackText;

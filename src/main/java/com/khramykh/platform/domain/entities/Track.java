@@ -18,25 +18,49 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "tracks")
-public class Track extends BaseEntity{
+public class Track extends BaseEntity {
     private String name;
+
     @Enumerated(EnumType.STRING)
     private TrackTypes type;
+
     private String description;
+
     private String photoUri;
+
     private String trackText;
+
     private boolean published;
+
     @CreatedDate
     private Date releaseDate;
-    @ManyToMany(fetch = FetchType.LAZY)
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id", nullable = false)
-    @CollectionTable(name = "category_track", joinColumns = @JoinColumn(name = "track_id"))
+    @JoinTable(
+            name = "category_track",
+            joinColumns = @JoinColumn(name = "track_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
     private Set<Category> categories = new HashSet<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "album_id")
     private Album album;
-    @ManyToMany(fetch = FetchType.LAZY)
-    @CollectionTable(name = "atrist_track", joinColumns = @JoinColumn(name = "track_id"))
-    @JoinColumn(name = "artist_id", nullable = false)
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "atrist_track",
+            joinColumns = @JoinColumn(name = "track_id"),
+            inverseJoinColumns = @JoinColumn(name = "artist_id", nullable = false)
+    )
     private Set<Artist> artists = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "track_likes",
+            joinColumns = {@JoinColumn(name = "track_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id")}
+    )
+    private Set<User> likes = new HashSet<>();
 }

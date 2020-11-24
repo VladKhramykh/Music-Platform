@@ -17,7 +17,7 @@ import java.util.Set;
 public class TrackUpdateCommand {
     private int id;
     private String name;
-    private TrackTypes type;
+    private String type;
     private String description;
     private String photoUri;
     private String trackText;

@@ -34,7 +34,6 @@ public class JwtTokenUtil implements Serializable {
         return claimsResolver.apply(claims);
     }
 
-
     public Claims getAllClaimsFromToken(String token) {
         return Jwts
                 .parser()

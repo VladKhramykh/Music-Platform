@@ -28,6 +28,18 @@ public class CategoriesController {
         return ResponseEntity.ok().body(categoryPage);
     }
 
+    @GetMapping("/like")
+    public ResponseEntity like(@RequestParam int trackId, @RequestParam int userId) {
+        categoriesService.like(trackId, userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/dislike")
+    public ResponseEntity dislike(@RequestParam int trackId, @RequestParam int userId) {
+        categoriesService.dislike(trackId, userId);
+        return ResponseEntity.ok().build();
+    }
+
 //    @GetMapping
 //    public ResponseEntity getOneByName(@RequestParam String name, @RequestParam int pageNum, @RequestParam int pageSize, @RequestParam CategorySort categorySort) {
 //        Page categoryPage = categoriesService.getCategoryByName(name, pageNum, pageSize, categorySort);

@@ -1,8 +1,7 @@
 package com.khramykh.platform.application.config.security;
 
-import com.khramykh.platform.api.utils.JwtAuthenticationEntryPoint;
+import com.khramykh.platform.api.commons.JwtAuthenticationEntryPoint;
 import com.khramykh.platform.api.filters.JwtRequestFilter;
-import com.khramykh.platform.application.usersApi.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,25 +22,22 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     @Autowired
-    private UserDetailsService jwtUserDetailsService;
+    UserDetailsService jwtUserDetailsService;
     @Autowired
-    private JwtRequestFilter jwtRequestFilter;
+    JwtRequestFilter jwtRequestFilter;
 
-//    @Autowired
-//    private PasswordEncoder passwordEncoder;
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(jwtUserDetailsService)
+                .passwordEncoder(passwordEncoder());
+    }
 
-//    @Autowired
-//    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.userDetailsService(jwtUserDetailsService)
-//                .passwordEncoder(passwordEncoder());
-//    }
-
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     @Override
@@ -52,7 +48,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable()
-                .authorizeRequests().antMatchers("/login",
+                .authorizeRequests().antMatchers("/authenticate",
                 "/logout",
                 "/logout-success",
                 "/v2/api-docs",
@@ -72,10 +68,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-    }
-
-    @Bean
-    public PasswordEncoder getPasswordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }

@@ -4,7 +4,7 @@ import com.khramykh.platform.domain.entities.User;
 
 import java.util.Optional;
 
-public interface UserRepository extends PagingAndSortingRepository<User, Integer> {
+public interface UsersRepository extends PagingAndSortingRepository<User, Integer> {
     Optional<User> findByEmailIgnoreCase(String email);
 
     Optional<User> findUserByActivationCode(String code);

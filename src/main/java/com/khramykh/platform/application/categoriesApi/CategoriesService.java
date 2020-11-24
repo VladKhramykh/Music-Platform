@@ -4,7 +4,8 @@ import com.khramykh.platform.application.categoriesApi.commands.CategoryCreateCo
 import com.khramykh.platform.application.categoriesApi.commands.CategoryUpdateCommand;
 import com.khramykh.platform.application.commons.sort.CategorySort;
 import com.khramykh.platform.application.exceptions.ResourceNotFoundException;
-import com.khramykh.platform.application.repositories.CategoryRepository;
+import com.khramykh.platform.application.repositories.CategoriesRepository;
+import com.khramykh.platform.application.repositories.UsersRepository;
 import com.khramykh.platform.domain.entities.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,7 +16,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class CategoriesService {
     @Autowired
-    CategoryRepository categoryRepository;
+    CategoriesRepository categoryRepository;
+    @Autowired
+    UsersRepository usersRepository;
 
     public Category getCategoryById(int id) {
         return categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
@@ -53,6 +56,20 @@ public class CategoriesService {
         category.setDescription(command.getDescription());
         categoryRepository.save(category);
         return category;
+    }
+
+    public void like(int categoryId, int userId) {
+        categoryRepository.findById(categoryId).map(category -> {
+            usersRepository.findById(userId).map(user -> category.getLikes().add(user));
+            return categoryRepository.save(category);
+        });
+    }
+
+    public void dislike(int categoryId, int userId) {
+        categoryRepository.findById(categoryId).map(category -> {
+            usersRepository.findById(userId).map(user -> category.getLikes().remove(user));
+            return categoryRepository.save(category);
+        });
     }
 
     private Sort getSortType(CategorySort categorySort) {

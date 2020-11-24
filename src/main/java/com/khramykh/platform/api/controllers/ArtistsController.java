@@ -28,6 +28,18 @@ public class ArtistsController {
         return ResponseEntity.ok().body(artist);
     }
 
+    @GetMapping("/like")
+    public ResponseEntity like(@RequestParam int trackId, @RequestParam int userId) {
+        artistsService.like(trackId, userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/dislike")
+    public ResponseEntity dislike(@RequestParam int trackId, @RequestParam int userId) {
+        artistsService.dislike(trackId, userId);
+        return ResponseEntity.ok().build();
+    }
+
 //    @GetMapping
 //    public ResponseEntity getAllByName(@RequestParam String name, @RequestParam int pageNum, @RequestParam int pageSize, @RequestParam ArtistSort artistSort) {
 //        Page artistsPage = artistsService.getArtistByName(name, pageNum, pageSize, artistSort);

@@ -19,17 +19,29 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Table(name = "albums")
-public class Album extends BaseEntity{
+public class Album extends BaseEntity {
     private String name;
+
     private String description;
+
     @Enumerated(EnumType.STRING)
     private AlbumTypes type;
+
     private String photoUri;
-    @CreatedDate
-    private Date releaseDate;
+
     @CreatedBy
-    @ManyToMany(fetch = FetchType.LAZY)
+    private Date releaseDate;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @CollectionTable(name = "artist_album", joinColumns = @JoinColumn(name = "album_id"))
     @JoinColumn(name = "artist_id", nullable = false)
     private Set<Artist> artists = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "album_likes",
+            joinColumns = {@JoinColumn(name = "album_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id")}
+    )
+    private Set<User> likes = new HashSet<>();
 }

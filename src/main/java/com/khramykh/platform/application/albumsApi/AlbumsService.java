@@ -5,6 +5,9 @@ import com.khramykh.platform.application.albumsApi.commands.AlbumUpdateCommand;
 import com.khramykh.platform.application.commons.sort.AlbumSort;
 import com.khramykh.platform.application.exceptions.ResourceNotFoundException;
 import com.khramykh.platform.application.repositories.AlbumsRepository;
+import com.khramykh.platform.application.repositories.ArtistsRepository;
+import com.khramykh.platform.application.repositories.UsersRepository;
+import com.khramykh.platform.domain.commons.enums.AlbumTypes;
 import com.khramykh.platform.domain.entities.Album;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,11 +15,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-// TODO !!! IMPORTANT !!! finish this Service, controller, repo
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 @Service
 public class AlbumsService {
     @Autowired
     AlbumsRepository albumsRepository;
+    @Autowired
+    ArtistsRepository artistsRepository;
+    @Autowired
+    UsersRepository usersRepository;
 
     public Album getAlbumById(int id) {
         return albumsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
@@ -42,18 +51,20 @@ public class AlbumsService {
         albumsRepository.deleteById(id);
     }
 
-    public Album update(AlbumUpdateCommand command) {
+    public Album update(AlbumUpdateCommand command) throws ParseException {
         Album oldAlbum = albumsRepository.findById(command.getId()).orElseThrow(() -> new ResourceNotFoundException((command.getId())));
         Album updated = albumsRepository.save(convertAlbumUpdateCommandToAlbum(oldAlbum, command));
         return updated;
     }
 
-    private Album convertAlbumUpdateCommandToAlbum(Album oldAlbum, AlbumUpdateCommand command) {
+    private Album convertAlbumUpdateCommandToAlbum(Album oldAlbum, AlbumUpdateCommand command) throws ParseException {
         oldAlbum.setName(command.getName());
-        oldAlbum.setType(command.getType());
-        oldAlbum.setArtists(command.getArtists());
+        oldAlbum.setType(AlbumTypes.valueOf(command.getType()));
+        command.getArtists().forEach(item -> {
+            oldAlbum.getArtists().add(artistsRepository.getOne(item.getId()));
+        });
         oldAlbum.setPhotoUri(command.getPhotoUri());
-        oldAlbum.setReleaseDate(command.getReleaseDate());
+        oldAlbum.setReleaseDate(new SimpleDateFormat("dd/MM/yyyy").parse(command.getReleaseDate()));
         oldAlbum.setDescription(command.getDescription());
         return oldAlbum;
     }
@@ -75,15 +86,31 @@ public class AlbumsService {
         }
     }
 
-    public Album create(AlbumCreateCommand command) {
+    public Album create(AlbumCreateCommand command) throws ParseException {
         Album album = new Album();
         album.setName(command.getName());
-        album.setType(command.getType());
-        album.setArtists(command.getArtists());
+        album.setType(AlbumTypes.valueOf(command.getType()));
+        command.getArtists().forEach(item -> {
+            album.getArtists().add(artistsRepository.getOne(item.getId()));
+        });
         album.setPhotoUri(command.getPhotoUri());
-        album.setReleaseDate(command.getReleaseDate());
+        album.setReleaseDate(new SimpleDateFormat("dd/MM/yyyy").parse(command.getReleaseDate()));
         album.setDescription(command.getDescription());
         albumsRepository.save(album);
         return album;
+    }
+
+    public void like(int albumId, int userId) {
+        albumsRepository.findById(albumId).map(album -> {
+            usersRepository.findById(userId).map(user -> album.getLikes().add(user));
+            return albumsRepository.save(album);
+        });
+    }
+
+    public void dislike(int albumId, int userId) {
+        albumsRepository.findById(albumId).map(album -> {
+            usersRepository.findById(userId).map(user -> album.getLikes().remove(user));
+            return albumsRepository.save(album);
+        });
     }
 }

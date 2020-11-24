@@ -28,6 +28,18 @@ public class TracksController {
         return ResponseEntity.ok().body(trackPage);
     }
 
+    @GetMapping("/like")
+    public ResponseEntity like(@RequestParam int trackId, @RequestParam int userId) {
+        tracksService.like(trackId, userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/dislike")
+    public ResponseEntity dislike(@RequestParam int trackId, @RequestParam int userId) {
+        tracksService.dislike(trackId, userId);
+        return ResponseEntity.ok().build();
+    }
+
 //    @GetMapping
 //    public ResponseEntity getOneByName(@RequestParam String name, @RequestParam int pageNum, @RequestParam int pageSize) {
 //        Page trackPage = tracksService.getTrackByName(name, pageNum, pageSize);

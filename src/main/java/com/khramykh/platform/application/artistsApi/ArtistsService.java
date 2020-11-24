@@ -5,6 +5,7 @@ import com.khramykh.platform.application.artistsApi.commands.ArtistUpdateCommand
 import com.khramykh.platform.application.commons.sort.ArtistSort;
 import com.khramykh.platform.application.exceptions.ResourceNotFoundException;
 import com.khramykh.platform.application.repositories.ArtistsRepository;
+import com.khramykh.platform.application.repositories.UsersRepository;
 import com.khramykh.platform.domain.entities.Artist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 public class ArtistsService {
     @Autowired
     ArtistsRepository artistsRepository;
+    @Autowired
+    UsersRepository usersRepository;
 
     public Artist getArtistById(int id) {
         return artistsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
@@ -72,5 +75,19 @@ public class ArtistsService {
         oldArtist.setName(command.getName());
         oldArtist.setDescription(command.getDescription());
         return oldArtist;
+    }
+
+    public void like(int artistId, int userId) {
+        artistsRepository.findById(artistId).map(artist -> {
+            usersRepository.findById(userId).map(user -> artist.getLikes().add(user));
+            return artistsRepository.save(artist);
+        });
+    }
+
+    public void dislike(int artistId, int userId) {
+        artistsRepository.findById(artistId).map(artist -> {
+            usersRepository.findById(userId).map(user -> artist.getLikes().remove(user));
+            return artistsRepository.save(artist);
+        });
     }
 }
