@@ -4,6 +4,8 @@ import com.khramykh.platform.api.commons.JwtRequest;
 import com.khramykh.platform.api.commons.JwtResponse;
 import com.khramykh.platform.application.config.security.JwtTokenUtil;
 import com.khramykh.platform.application.config.security.JwtUserDetailsService;
+import com.khramykh.platform.application.usersApi.UsersService;
+import com.khramykh.platform.domain.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,13 +24,16 @@ public class JwtAuthController {
     JwtTokenUtil tokenUtil;
     @Autowired
     JwtUserDetailsService userDetailsService;
+    @Autowired
+    UsersService usersService;
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity createAuthToken(@RequestBody JwtRequest jwtRequest) throws Exception {
         authenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
         UserDetails userDetails = userDetailsService.loadUserByUsername(jwtRequest.getUsername());
         String token = tokenUtil.generateToken(userDetails);
-        return ResponseEntity.ok(new JwtResponse(token));
+        User user = usersService.getUserByEmail(userDetails.getUsername());
+        return ResponseEntity.ok(new JwtResponse(token, user));
     }
 
     private void authenticate(String username, String password) throws Exception {

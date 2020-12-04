@@ -76,7 +76,7 @@ public class UsersService {
         user.setLastName(command.getLastName());
         user.setEmail(command.getEmail());
         // TODO need to fix date persing (maybe need to change type of birthday)
-        user.setBirthday(new SimpleDateFormat("dd/MM/yyyy").parse(command.getBirthday()));
+        user.setBirthday(new SimpleDateFormat("yyyy-MM-dd").parse(command.getBirthday().substring(0,10)));
         user.setGender(UserGender.valueOf(command.getGender()));
         user.setCountry(Country.valueOf(command.getCountry()));
         user.setActivationCode(UUID.randomUUID().toString());
