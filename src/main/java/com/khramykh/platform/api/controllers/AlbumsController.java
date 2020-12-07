@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/albums")
@@ -22,6 +23,12 @@ public class AlbumsController {
     public ResponseEntity getPage(@RequestParam int pageNum, @RequestParam int pageSize, @RequestParam AlbumSort albumSort) {
         Page<Album> albumsPage = albumsService.getAlbumsByPage(pageNum, pageSize, albumSort);
         return ResponseEntity.ok().body(albumsPage);
+    }
+
+    @GetMapping("/artist")
+    public ResponseEntity getAlbumsByArtistId(@RequestParam int artistId, @RequestParam AlbumSort albumSort) {
+        List<Album> albumsList = albumsService.getAlbumsByArtist(artistId, albumSort);
+        return ResponseEntity.ok().body(albumsList);
     }
 
     @GetMapping("{id}")

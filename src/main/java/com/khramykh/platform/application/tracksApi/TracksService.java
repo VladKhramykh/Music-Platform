@@ -6,12 +6,17 @@ import com.khramykh.platform.application.repositories.*;
 import com.khramykh.platform.application.tracksApi.commands.TrackCreateCommand;
 import com.khramykh.platform.application.tracksApi.commands.TrackUpdateCommand;
 import com.khramykh.platform.domain.commons.enums.TrackTypes;
+import com.khramykh.platform.domain.entities.Artist;
 import com.khramykh.platform.domain.entities.Track;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class TracksService {
@@ -34,8 +39,17 @@ public class TracksService {
         return tracksRepository.findByNameContaining(name, PageRequest.of(pageNum, pageSize, getSortType(trackSort)));
     }
 
+    public Page<Track> getTrackByArtist(int id, int pageNum, int pageSize, TrackSort trackSort) {
+        Artist artist = artistsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException((id)));
+        return tracksRepository.findByArtists(artist, PageRequest.of(pageNum, pageSize, getSortType(trackSort)));
+    }
+
     public Page<Track> getTracksByPage(int pageNum, int pageSize, TrackSort trackSort) {
         return tracksRepository.findAll(PageRequest.of(pageNum, pageSize, getSortType(trackSort)));
+    }
+
+    public List<Track> getTracksByAlbum(int albumID, TrackSort trackSort) {
+        return tracksRepository.findByAlbum_Id(albumID);
     }
 
     // TODO need to realize finding top-10 categories

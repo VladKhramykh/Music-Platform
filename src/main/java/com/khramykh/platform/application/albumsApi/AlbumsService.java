@@ -9,6 +9,7 @@ import com.khramykh.platform.application.repositories.ArtistsRepository;
 import com.khramykh.platform.application.repositories.UsersRepository;
 import com.khramykh.platform.domain.commons.enums.AlbumTypes;
 import com.khramykh.platform.domain.entities.Album;
+import com.khramykh.platform.domain.entities.Artist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 @Service
 public class AlbumsService {
@@ -37,6 +39,11 @@ public class AlbumsService {
 
     public Page<Album> getAlbumsByPage(int pageNum, int pageSize, AlbumSort albumSort) {
         return albumsRepository.findAll(PageRequest.of(pageNum, pageSize, getSortType(albumSort)));
+    }
+
+    public List<Album> getAlbumsByArtist(int artistId, AlbumSort albumSort) {
+        Artist artist = artistsRepository.findById(artistId).orElseThrow(() -> new ResourceNotFoundException(artistId));
+        return albumsRepository.findAlbumsByArtistsContaining(artist, getSortType(albumSort));
     }
 
     // TODO need to realize finding top-10 albums

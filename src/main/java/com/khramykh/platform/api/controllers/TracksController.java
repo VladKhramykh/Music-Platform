@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/api/tracks")
 public class TracksController {
@@ -38,6 +40,18 @@ public class TracksController {
     public ResponseEntity dislike(@RequestParam int trackId, @RequestParam int userId) {
         tracksService.dislike(trackId, userId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/artist")
+    public ResponseEntity getTracksByArtistId(@RequestParam Integer artistId, @RequestParam int pageNum, @RequestParam int pageSize, TrackSort trackSort) {
+        Page trackPage = tracksService.getTrackByArtist(artistId, pageNum, pageSize, trackSort);
+        return ResponseEntity.ok().body(trackPage);
+    }
+
+    @GetMapping("/album")
+    public ResponseEntity getTracksByAlbumId(@RequestParam int albumId, TrackSort trackSort) {
+        List trackPage = tracksService.getTracksByAlbum(albumId, trackSort);
+        return ResponseEntity.ok().body(trackPage);
     }
 
 //    @GetMapping
