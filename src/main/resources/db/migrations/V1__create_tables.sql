@@ -10,17 +10,17 @@ create table album_likes
 create table albums
 (
     id                 int not null,
-    created_by         varchar(255),
+    created_by         nvarchar(255),
     created_date       datetime2,
     deleted            bit,
-    last_modified_by   varchar(255),
+    last_modified_by   nvarchar(255),
     last_modified_date datetime2,
     version            int,
-    description        varchar(255),
-    name               varchar(255),
-    photo_uri          varchar(255),
+    description        nvarchar(255),
+    name               nvarchar(255),
+    photo_uri          nvarchar(255),
     release_date       datetime2,
-    type               varchar(255),
+    type               nvarchar(255),
     primary key (id)
 )
 
@@ -41,14 +41,14 @@ create table artist_likes
 create table artists
 (
     id                 int          not null,
-    created_by         varchar(255),
+    created_by         nvarchar(255),
     created_date       datetime2,
     deleted            bit,
-    last_modified_by   varchar(255),
+    last_modified_by   nvarchar(255),
     last_modified_date datetime2,
     version            int,
-    description        varchar(255) not null,
-    name               varchar(255) not null,
+    description        nvarchar(255) not null,
+    name               nvarchar(255) not null,
     primary key (id)
 )
 
@@ -76,14 +76,14 @@ create table category_track
 create table track_categories
 (
     id                 int not null,
-    created_by         varchar(255),
+    created_by         nvarchar(255),
     created_date       datetime2,
     deleted            bit,
-    last_modified_by   varchar(255),
+    last_modified_by   nvarchar(255),
     last_modified_date datetime2,
     version            int,
-    description        varchar(255),
-    name               varchar(255),
+    description        nvarchar(255),
+    name               nvarchar(255),
     primary key (id)
 )
 
@@ -97,19 +97,19 @@ create table track_likes
 create table tracks
 (
     id                 int not null,
-    created_by         varchar(255),
+    created_by         nvarchar(255),
     created_date       datetime2,
     deleted            bit,
-    last_modified_by   varchar(255),
+    last_modified_by   nvarchar(255),
     last_modified_date datetime2,
     version            int,
-    description        varchar(255),
-    name               varchar(255),
-    photo_uri          varchar(255),
+    description        nvarchar(255),
+    name               nvarchar(255),
+    photo_uri          nvarchar(255),
     published          bit not null,
     release_date       datetime2,
-    track_text         varchar(255),
-    type               varchar(255),
+    track_text         nvarchar(255),
+    type               nvarchar(255),
     album_id           int,
     primary key (id)
 )
@@ -117,27 +117,27 @@ create table tracks
 create table user_role
 (
     user_id int not null,
-    roles   varchar(255)
+    roles   nvarchar(255)
 )
 
 create table users
 (
     id                 int          not null,
-    created_by         varchar(255),
+    created_by         nvarchar(255),
     created_date       datetime2,
     deleted            bit,
-    last_modified_by   varchar(255),
+    last_modified_by   nvarchar(255),
     last_modified_date datetime2,
     version            int,
-    activation_code    varchar(255),
+    activation_code    nvarchar(255),
     birthday           datetime2    not null,
-    country            varchar(255) not null,
-    email              varchar(255) not null,
-    first_name         varchar(255) not null,
-    gender             varchar(255) not null,
-    hash_password      varchar(255),
-    last_name          varchar(255) not null,
-    photo_uri          varchar(255),
+    country            nvarchar(255) not null,
+    email              nvarchar(255) not null,
+    first_name         nvarchar(255) not null,
+    gender             nvarchar(255) not null,
+    hash_password      nvarchar(255),
+    last_name          nvarchar(255) not null,
+    photo_uri          nvarchar(255),
     primary key (id)
 )
 

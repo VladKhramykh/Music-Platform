@@ -1,6 +1,7 @@
 package com.khramykh.platform.application.usersApi;
 
 import com.khramykh.platform.application.commons.sort.UserSort;
+import com.khramykh.platform.application.commons.utils.FileHelper;
 import com.khramykh.platform.application.exceptions.EmailAlreadyInUseException;
 import com.khramykh.platform.application.exceptions.UserNotFoundException;
 import com.khramykh.platform.application.repositories.UsersRepository;
@@ -10,7 +11,9 @@ import com.khramykh.platform.domain.commons.enums.Country;
 import com.khramykh.platform.domain.commons.enums.Role;
 import com.khramykh.platform.domain.commons.enums.UserGender;
 import com.khramykh.platform.domain.entities.User;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -18,10 +21,14 @@ import org.springframework.mail.MailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,6 +42,9 @@ public class UsersService {
 
     @Autowired
     private MailSender mailSender;
+
+    @Value("${upload.path}")
+    private String uploadPath;
 
     public User getUserById(int id) {
         return usersRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
@@ -55,7 +65,7 @@ public class UsersService {
         usersRepository.deleteById(id);
     }
 
-    public User update(UserUpdateCommand command) throws ParseException {
+    public User update(UserUpdateCommand command) throws ParseException, IOException {
         User oldUser = usersRepository.findById(command.getId()).orElseThrow(() -> new UserNotFoundException(command.getId()));
         User updated = usersRepository.save(convertUserUpdateCommandToUser(oldUser, command));
         return updated;
@@ -66,7 +76,7 @@ public class UsersService {
         return user.isPresent();
     }
 
-    public User registration(UserRegistrationCommand command) throws ParseException {
+    public User registration(UserRegistrationCommand command) throws ParseException, IOException {
         if (isExistsByEmail(command.getEmail())) {
             throw new EmailAlreadyInUseException("There is an account with that email adress: " + command.getEmail());
         }
@@ -75,6 +85,7 @@ public class UsersService {
         user.setFirstName(command.getFirstName());
         user.setLastName(command.getLastName());
         user.setEmail(command.getEmail());
+        user.setPhotoUri(saveFile(command.getFile()));
         // TODO need to fix date persing (maybe need to change type of birthday)
         user.setBirthday(new SimpleDateFormat("yyyy-MM-dd").parse(command.getBirthday().substring(0,10)));
         user.setGender(UserGender.valueOf(command.getGender()));
@@ -149,10 +160,36 @@ public class UsersService {
         }
         oldUser.setBirthday(new SimpleDateFormat("dd/MM/yyyy").parse(command.getBirthday()));
         oldUser.setCountry(Country.valueOf(command.getCountry()));
-        oldUser.setPhotoUri(command.getPhotoUri());
         oldUser.setHashPassword(command.getPassword());
         oldUser.setGender(UserGender.valueOf(command.getGender()));
 
         return oldUser;
+    }
+
+    public String updatePhoto(int id, MultipartFile file) throws IOException {
+        User user = usersRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        user.setPhotoUri(saveFile(file));
+        usersRepository.save(user);
+        return user.getPhotoUri();
+    }
+
+    public String saveFile(MultipartFile file) throws IOException {
+        if (file != null && !Objects.requireNonNull(file.getOriginalFilename()).isEmpty()) {
+            System.out.println(uploadPath);
+            File uploadDir = new File(uploadPath);
+
+            if (!uploadDir.exists()) {
+                uploadDir.mkdir();
+            }
+
+            String uuidFile = UUID.randomUUID().toString();
+            String resultFilename = uuidFile + "." + file.getOriginalFilename();
+
+            file.transferTo(new File(uploadPath + "/images/users/" + resultFilename));
+
+            return resultFilename;
+        } else {
+            return Strings.EMPTY;
+        }
     }
 }

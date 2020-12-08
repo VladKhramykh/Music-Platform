@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -60,6 +62,12 @@ public class TracksController {
 //        return ResponseEntity.ok().body(trackPage);
 //    }
 
+    @PostMapping("/photo")
+    public ResponseEntity setPhoto(@RequestParam int id, @RequestParam(name = "file") MultipartFile file) throws IOException {
+        String photoUrl = tracksService.updatePhoto(id, file);
+        return ResponseEntity.ok().body(photoUrl);
+    }
+
     @DeleteMapping("{id}")
     public ResponseEntity delete(@PathVariable int id) {
         tracksService.removeById(id);
@@ -67,13 +75,13 @@ public class TracksController {
     }
 
     @PutMapping
-    public ResponseEntity update(@RequestBody TrackUpdateCommand command) {
+    public ResponseEntity update(@RequestBody TrackUpdateCommand command) throws IOException {
         Track updated = tracksService.update(command);
         return ResponseEntity.ok().body(updated);
     }
 
     @PostMapping
-    public ResponseEntity create(@RequestBody TrackCreateCommand command) {
+    public ResponseEntity create(@RequestBody TrackCreateCommand command) throws IOException {
         Track created = tracksService.create(command);
         return ResponseEntity.ok().body(created);
     }

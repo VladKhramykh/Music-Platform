@@ -31,7 +31,9 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/img/**")
-                .addResourceLocations("file:///" + uploadPath + "/");
+                .addResourceLocations("file:///" + uploadPath + "/images/");
+        registry.addResourceHandler("/tracks/**")
+                .addResourceLocations("file:///" + uploadPath + "/tracks/");
         registry.addResourceHandler("/static/**")
                 .addResourceLocations("classpath:/static/");
         registry.addResourceHandler("swagger-ui.html")

@@ -10,15 +10,22 @@ import com.khramykh.platform.application.repositories.UsersRepository;
 import com.khramykh.platform.domain.commons.enums.AlbumTypes;
 import com.khramykh.platform.domain.entities.Album;
 import com.khramykh.platform.domain.entities.Artist;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 public class AlbumsService {
@@ -28,6 +35,8 @@ public class AlbumsService {
     ArtistsRepository artistsRepository;
     @Autowired
     UsersRepository usersRepository;
+    @Value("${upload.path}")
+    private String uploadPath;
 
     public Album getAlbumById(int id) {
         return albumsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
@@ -58,19 +67,19 @@ public class AlbumsService {
         albumsRepository.deleteById(id);
     }
 
-    public Album update(AlbumUpdateCommand command) throws ParseException {
+    public Album update(AlbumUpdateCommand command) throws ParseException, IOException {
         Album oldAlbum = albumsRepository.findById(command.getId()).orElseThrow(() -> new ResourceNotFoundException((command.getId())));
         Album updated = albumsRepository.save(convertAlbumUpdateCommandToAlbum(oldAlbum, command));
         return updated;
     }
 
-    private Album convertAlbumUpdateCommandToAlbum(Album oldAlbum, AlbumUpdateCommand command) throws ParseException {
+    private Album convertAlbumUpdateCommandToAlbum(Album oldAlbum, AlbumUpdateCommand command) throws ParseException, IOException {
         oldAlbum.setName(command.getName());
         oldAlbum.setType(AlbumTypes.valueOf(command.getType()));
         command.getArtists().forEach(item -> {
             oldAlbum.getArtists().add(artistsRepository.getOne(item.getId()));
         });
-        oldAlbum.setPhotoUri(command.getPhotoUri());
+        oldAlbum.setPhotoUri(saveFile(command.getFile()));
         oldAlbum.setReleaseDate(new SimpleDateFormat("dd/MM/yyyy").parse(command.getReleaseDate()));
         oldAlbum.setDescription(command.getDescription());
         return oldAlbum;
@@ -93,14 +102,14 @@ public class AlbumsService {
         }
     }
 
-    public Album create(AlbumCreateCommand command) throws ParseException {
+    public Album create(AlbumCreateCommand command) throws ParseException, IOException {
         Album album = new Album();
         album.setName(command.getName());
         album.setType(AlbumTypes.valueOf(command.getType()));
         command.getArtists().forEach(item -> {
             album.getArtists().add(artistsRepository.getOne(item.getId()));
         });
-        album.setPhotoUri(command.getPhotoUri());
+        album.setPhotoUri(saveFile(command.getFile()));
         album.setReleaseDate(new SimpleDateFormat("dd/MM/yyyy").parse(command.getReleaseDate()));
         album.setDescription(command.getDescription());
         albumsRepository.save(album);
@@ -119,5 +128,45 @@ public class AlbumsService {
             usersRepository.findById(userId).map(user -> album.getLikes().remove(user));
             return albumsRepository.save(album);
         });
+    }
+
+    public String saveFile(MultipartFile file) throws IOException {
+        if (file != null && !Objects.requireNonNull(file.getOriginalFilename()).isEmpty()) {
+            System.out.println(uploadPath);
+            File uploadDir = new File(uploadPath);
+
+            if (!uploadDir.exists()) {
+                uploadDir.mkdir();
+            }
+
+            String uuidFile = UUID.randomUUID().toString();
+            String resultFilename = uuidFile + "." + file.getOriginalFilename();
+
+            file.transferTo(new File(uploadPath + "/images/albums/" + resultFilename));
+
+            return resultFilename;
+        } else {
+            return Strings.EMPTY;
+        }
+    }
+
+    public String updatePhoto(int id, MultipartFile file) throws IOException {
+        if (file != null && !Objects.requireNonNull(file.getOriginalFilename()).isEmpty()) {
+            System.out.println(uploadPath);
+            File uploadDir = new File(uploadPath);
+
+            if (!uploadDir.exists()) {
+                uploadDir.mkdir();
+            }
+
+            String uuidFile = UUID.randomUUID().toString();
+            String resultFilename = uuidFile + "." + file.getOriginalFilename();
+
+            file.transferTo(new File(uploadPath + "/images/albums/" + resultFilename));
+
+            return resultFilename;
+        } else {
+            return Strings.EMPTY;
+        }
     }
 }

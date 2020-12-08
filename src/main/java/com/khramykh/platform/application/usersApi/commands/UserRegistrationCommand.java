@@ -3,6 +3,7 @@ package com.khramykh.platform.application.usersApi.commands;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @AllArgsConstructor
@@ -12,7 +13,7 @@ public class UserRegistrationCommand {
     private String lastName;
     private String email;
     private String birthday;
-    private String photoUri;
+    private MultipartFile file;
     private String gender;
     private String country;
     private String password;

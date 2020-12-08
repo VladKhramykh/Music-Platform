@@ -4,6 +4,7 @@ import com.khramykh.platform.domain.commons.enums.UserGender;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 
@@ -16,7 +17,7 @@ public class UserUpdateCommand {
     private String lastName;
     private String email;
     private String birthday;
-    private String photoUri;
+    private MultipartFile file;
     private String gender;
     private String country;
     private String password;

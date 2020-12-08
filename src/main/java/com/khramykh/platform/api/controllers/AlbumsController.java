@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
@@ -37,6 +39,13 @@ public class AlbumsController {
         return ResponseEntity.ok().body(albums);
     }
 
+    @PostMapping("/photo")
+    public ResponseEntity setPhoto(@RequestParam int id, @RequestParam(name = "file") MultipartFile file) throws IOException {
+        String photoUrl = albumsService.updatePhoto(id, file);
+        return ResponseEntity.ok().body(photoUrl);
+    }
+
+
     @GetMapping("/like")
     public ResponseEntity like(@RequestParam int trackId, @RequestParam int userId) {
         albumsService.like(trackId, userId);
@@ -62,13 +71,13 @@ public class AlbumsController {
     }
 
     @PutMapping
-    public ResponseEntity update(@RequestBody AlbumUpdateCommand command) throws ParseException {
+    public ResponseEntity update(@RequestBody AlbumUpdateCommand command) throws ParseException, IOException {
         Album updated = albumsService.update(command);
         return ResponseEntity.ok().body(updated);
     }
 
     @PostMapping
-    public ResponseEntity create(@RequestBody AlbumCreateCommand command) throws ParseException {
+    public ResponseEntity create(@RequestBody AlbumCreateCommand command) throws ParseException, IOException {
         Album created = albumsService.create(command);
         return ResponseEntity.ok().body(created);
     }
