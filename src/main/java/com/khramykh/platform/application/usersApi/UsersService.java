@@ -1,7 +1,6 @@
 package com.khramykh.platform.application.usersApi;
 
 import com.khramykh.platform.application.commons.sort.UserSort;
-import com.khramykh.platform.application.commons.utils.FileHelper;
 import com.khramykh.platform.application.exceptions.EmailAlreadyInUseException;
 import com.khramykh.platform.application.exceptions.UserNotFoundException;
 import com.khramykh.platform.application.repositories.UsersRepository;
@@ -65,9 +64,14 @@ public class UsersService {
         usersRepository.deleteById(id);
     }
 
-    public User update(UserUpdateCommand command) throws ParseException, IOException {
+    public User update(UserUpdateCommand command) throws ParseException {
         User oldUser = usersRepository.findById(command.getId()).orElseThrow(() -> new UserNotFoundException(command.getId()));
-        User updated = usersRepository.save(convertUserUpdateCommandToUser(oldUser, command));
+        User updated;
+        if (command.getPassword().trim().length() > 0) {
+            updated = usersRepository.save(convertUserUpdateCommandToUser(oldUser, command, true));
+        } else {
+            updated = usersRepository.save(convertUserUpdateCommandToUser(oldUser, command, false));
+        }
         return updated;
     }
 
@@ -87,7 +91,7 @@ public class UsersService {
         user.setEmail(command.getEmail());
         user.setPhotoUri(saveFile(command.getFile()));
         // TODO need to fix date persing (maybe need to change type of birthday)
-        user.setBirthday(new SimpleDateFormat("yyyy-MM-dd").parse(command.getBirthday().substring(0,10)));
+        user.setBirthday(new SimpleDateFormat("yyyy-MM-dd").parse(command.getBirthday().substring(0, 10)));
         user.setGender(UserGender.valueOf(command.getGender()));
         user.setCountry(Country.valueOf(command.getCountry()));
         user.setActivationCode(UUID.randomUUID().toString());
@@ -152,15 +156,17 @@ public class UsersService {
         }
     }
 
-    private User convertUserUpdateCommandToUser(User oldUser, UserUpdateCommand command) throws ParseException {
+    private User convertUserUpdateCommandToUser(User oldUser, UserUpdateCommand command, boolean isPasswordChanged) throws ParseException {
         oldUser.setFirstName(command.getFirstName());
         oldUser.setLastName(command.getLastName());
         if (!oldUser.getEmail().equals(command.getEmail())) {
             oldUser.setActivationCode(UUID.randomUUID().toString());
         }
-        oldUser.setBirthday(new SimpleDateFormat("dd/MM/yyyy").parse(command.getBirthday()));
+        oldUser.setBirthday(new SimpleDateFormat("yyyy-MM-dd").parse(command.getBirthday()));
         oldUser.setCountry(Country.valueOf(command.getCountry()));
-        oldUser.setHashPassword(command.getPassword());
+        if (isPasswordChanged) {
+            oldUser.setHashPassword(command.getPassword());
+        }
         oldUser.setGender(UserGender.valueOf(command.getGender()));
 
         return oldUser;

@@ -76,6 +76,14 @@ public class CategoriesService {
         switch (categorySort) {
             case NAME_DESC:
                 return Sort.by("name").descending();
+            case ID_DESC:
+                return Sort.by("id").descending();
+            case ID_ASC:
+                return Sort.by("id").ascending();
+            case DESCRIPTION_DESC:
+                return Sort.by("description").descending();
+            case DESCRIPTION_ASC:
+                return Sort.by("description").ascending();
             default:
                 return Sort.by("name").ascending();
         }

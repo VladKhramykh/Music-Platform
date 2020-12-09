@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+
 @RestController
 @RequestMapping(value = "/api/artists")
 public class ArtistsController {
@@ -53,13 +55,13 @@ public class ArtistsController {
     }
 
     @PutMapping
-    public ResponseEntity update(@RequestBody ArtistUpdateCommand command) {
+    public ResponseEntity update(@RequestBody ArtistUpdateCommand command) throws ParseException {
         Artist updated = artistsService.update(command);
         return ResponseEntity.ok().body(updated);
     }
 
     @PostMapping
-    public ResponseEntity create(@RequestBody ArtistCreateCommand command) {
+    public ResponseEntity create(@RequestBody ArtistCreateCommand command) throws ParseException {
         Artist created = artistsService.create(command);
         return ResponseEntity.ok().body(created);
     }

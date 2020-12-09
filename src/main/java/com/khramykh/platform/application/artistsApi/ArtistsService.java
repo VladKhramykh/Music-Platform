@@ -13,6 +13,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @Service
 public class ArtistsService {
     @Autowired
@@ -44,16 +48,17 @@ public class ArtistsService {
         artistsRepository.deleteById(id);
     }
 
-    public Artist update(ArtistUpdateCommand command) {
+    public Artist update(ArtistUpdateCommand command) throws ParseException {
         Artist oldArtist = artistsRepository.findById(command.getId()).orElseThrow(() -> new ResourceNotFoundException((command.getId())));
         Artist updated = artistsRepository.save(convertArtistUpdateCommandToArtist(oldArtist, command));
         return updated;
     }
 
-    public Artist create(ArtistCreateCommand command) {
+    public Artist create(ArtistCreateCommand command) throws ParseException {
         Artist artist = new Artist();
         artist.setName(command.getName());
         artist.setDescription(command.getDescription());
+        artist.setCreatedDate(new SimpleDateFormat("yyyy-MM-dd").parse(command.getCreatedDate()));
         artistsRepository.save(artist);
         return artist;
     }
@@ -71,9 +76,11 @@ public class ArtistsService {
         }
     }
 
-    private Artist convertArtistUpdateCommandToArtist(Artist oldArtist, ArtistUpdateCommand command) {
+    private Artist convertArtistUpdateCommandToArtist(Artist oldArtist, ArtistUpdateCommand command) throws ParseException {
         oldArtist.setName(command.getName());
         oldArtist.setDescription(command.getDescription());
+        oldArtist.setCreatedDate(new SimpleDateFormat("yyyy-MM-dd").parse(command.getCreatedDate()));
+        oldArtist.setDeleted(command.isDeleted());
         return oldArtist;
     }
 

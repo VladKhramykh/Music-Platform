@@ -11,4 +11,6 @@ public class ArtistUpdateCommand {
     private int id;
     private String name;
     private String description;
+    private boolean deleted;
+    private String createdDate;
 }

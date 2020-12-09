@@ -17,7 +17,6 @@ public class UserUpdateCommand {
     private String lastName;
     private String email;
     private String birthday;
-    private MultipartFile file;
     private String gender;
     private String country;
     private String password;
