@@ -4,6 +4,7 @@ import com.khramykh.platform.application.albumsApi.AlbumsService;
 import com.khramykh.platform.application.albumsApi.commands.AlbumCreateCommand;
 import com.khramykh.platform.application.albumsApi.commands.AlbumUpdateCommand;
 import com.khramykh.platform.application.commons.sort.AlbumSort;
+import com.khramykh.platform.domain.commons.enums.AlbumTypes;
 import com.khramykh.platform.domain.entities.Album;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,11 @@ public class AlbumsController {
     public ResponseEntity getPage(@RequestParam int pageNum, @RequestParam int pageSize, @RequestParam AlbumSort albumSort) {
         Page<Album> albumsPage = albumsService.getAlbumsByPage(pageNum, pageSize, albumSort);
         return ResponseEntity.ok().body(albumsPage);
+    }
+
+    @GetMapping("/types")
+    public ResponseEntity getTypes() {
+        return ResponseEntity.ok().body(AlbumTypes.values());
     }
 
     @GetMapping("/artist")
@@ -58,16 +64,10 @@ public class AlbumsController {
         return ResponseEntity.ok().build();
     }
 
-//    @GetMapping
-//    public ResponseEntity getPageByName(@RequestParam String name, @RequestParam int pageNum, @RequestParam int pageSize, @RequestParam AlbumSort albumSort) {
-//        Page albumPage = albumsService.getAlbumByNameContaining(name, pageNum, pageSize, albumSort);
-//        return ResponseEntity.ok().body(albumPage);
-//    }
-
     @DeleteMapping("{id}")
     public ResponseEntity delete(@PathVariable int id) {
         albumsService.removeById(id);
-        return (ResponseEntity) ResponseEntity.noContent();
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping

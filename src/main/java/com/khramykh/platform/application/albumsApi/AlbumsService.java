@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -76,11 +77,11 @@ public class AlbumsService {
     private Album convertAlbumUpdateCommandToAlbum(Album oldAlbum, AlbumUpdateCommand command) throws ParseException, IOException {
         oldAlbum.setName(command.getName());
         oldAlbum.setType(AlbumTypes.valueOf(command.getType()));
-        command.getArtists().forEach(item -> {
-            oldAlbum.getArtists().add(artistsRepository.getOne(item.getId()));
+        Arrays.stream(command.getArtists()).forEach(id -> {
+            oldAlbum.getArtists().add(artistsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id)));
         });
         oldAlbum.setPhotoUri(saveFile(command.getFile()));
-        oldAlbum.setReleaseDate(new SimpleDateFormat("dd/MM/yyyy").parse(command.getReleaseDate()));
+        oldAlbum.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse(command.getReleaseDate()));
         oldAlbum.setDescription(command.getDescription());
         return oldAlbum;
     }
@@ -106,11 +107,11 @@ public class AlbumsService {
         Album album = new Album();
         album.setName(command.getName());
         album.setType(AlbumTypes.valueOf(command.getType()));
-        command.getArtists().forEach(item -> {
-            album.getArtists().add(artistsRepository.getOne(item.getId()));
+        Arrays.stream(command.getArtists()).forEach(id -> {
+            album.getArtists().add(artistsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id)));
         });
         album.setPhotoUri(saveFile(command.getFile()));
-        album.setReleaseDate(new SimpleDateFormat("dd/MM/yyyy").parse(command.getReleaseDate()));
+        album.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse(command.getReleaseDate()));
         album.setDescription(command.getDescription());
         albumsRepository.save(album);
         return album;

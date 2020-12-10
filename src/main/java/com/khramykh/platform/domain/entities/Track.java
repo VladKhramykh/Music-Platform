@@ -32,7 +32,7 @@ public class Track extends BaseEntity {
 
     private boolean published;
 
-    @CreatedDate
+    @Temporal(TemporalType.TIMESTAMP)
     private Date releaseDate;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

@@ -5,8 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -28,11 +27,10 @@ public class Album extends BaseEntity {
     private AlbumTypes type;
 
     private String photoUri;
-
-    @CreatedBy
+    @Temporal(TemporalType.TIMESTAMP)
     private Date releaseDate;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
     @CollectionTable(name = "artist_album", joinColumns = @JoinColumn(name = "album_id"))
     @JoinColumn(name = "artist_id", nullable = false)
     private Set<Artist> artists = new HashSet<>();

@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/api/categories")
 public class CategoriesController {
@@ -20,6 +22,12 @@ public class CategoriesController {
     public ResponseEntity getAll(@RequestParam int pageNum, @RequestParam int pageSize, @RequestParam CategorySort categorySort) {
         Page<Category> categoryPage = categoriesService.getCategoriesByPage(pageNum, pageSize, categorySort);
         return ResponseEntity.ok().body(categoryPage);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity getAll() {
+        List<Category> categories = categoriesService.getCategories();
+        return ResponseEntity.ok().body(categories);
     }
 
     @GetMapping("{id}")

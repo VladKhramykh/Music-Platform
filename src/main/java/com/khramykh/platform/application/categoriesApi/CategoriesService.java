@@ -13,6 +13,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CategoriesService {
     @Autowired
@@ -22,6 +24,10 @@ public class CategoriesService {
 
     public Category getCategoryById(int id) {
         return categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+    }
+
+    public List<Category> getCategories() {
+        return categoryRepository.findAll();
     }
 
     public Page<Category> getCategoryByName(String name, int pageNum, int pageSize, CategorySort categorySort) {
