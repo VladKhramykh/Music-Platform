@@ -189,7 +189,7 @@ public class UsersService {
             }
 
             String uuidFile = UUID.randomUUID().toString();
-            String resultFilename = uuidFile + "." + file.getOriginalFilename();
+            String resultFilename = uuidFile + "." + file.getOriginalFilename().replace(' ', '_');
 
             file.transferTo(new File(uploadPath + "/images/users/" + resultFilename));
 

@@ -30,8 +30,12 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/img/**")
-                .addResourceLocations("file:///" + uploadPath + "/images/");
+        registry.addResourceHandler("/img/albums/**")
+                .addResourceLocations("file:///" + uploadPath + "/images/albums/");
+        registry.addResourceHandler("/img/tracks/**")
+                .addResourceLocations("file:///" + uploadPath + "/images/tracks/");
+        registry.addResourceHandler("/img/users/**")
+                .addResourceLocations("file:///" + uploadPath + "/images/users/");
         registry.addResourceHandler("/tracks/**")
                 .addResourceLocations("file:///" + uploadPath + "/tracks/");
         registry.addResourceHandler("/static/**")

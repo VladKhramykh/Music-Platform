@@ -78,6 +78,7 @@ public class AlbumsService {
         oldAlbum.setName(command.getName());
         oldAlbum.setType(AlbumTypes.valueOf(command.getType()));
         Arrays.stream(command.getArtists()).forEach(id -> {
+            oldAlbum.getArtists().clear();
             oldAlbum.getArtists().add(artistsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id)));
         });
         oldAlbum.setPhotoUri(saveFile(command.getFile()));
@@ -141,7 +142,7 @@ public class AlbumsService {
             }
 
             String uuidFile = UUID.randomUUID().toString();
-            String resultFilename = uuidFile + "." + file.getOriginalFilename();
+            String resultFilename = uuidFile + "." + file.getOriginalFilename().replace(' ', '_');
 
             file.transferTo(new File(uploadPath + "/images/albums/" + resultFilename));
 
@@ -161,7 +162,7 @@ public class AlbumsService {
             }
 
             String uuidFile = UUID.randomUUID().toString();
-            String resultFilename = uuidFile + "." + file.getOriginalFilename();
+            String resultFilename = uuidFile + "." + file.getOriginalFilename().replace(' ', '_');
 
             file.transferTo(new File(uploadPath + "/images/albums/" + resultFilename));
 

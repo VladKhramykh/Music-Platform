@@ -27,6 +27,7 @@ public class Track extends BaseEntity {
     private String description;
 
     private String photoUri;
+    private String trackUri;
 
     private String trackText;
 
@@ -44,7 +45,7 @@ public class Track extends BaseEntity {
     )
     private Set<Category> categories = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "album_id")
     private Album album;
 

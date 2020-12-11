@@ -19,6 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -78,27 +81,24 @@ public class TracksService {
         return updated;
     }
 
-    public Track create(TrackCreateCommand command) throws IOException {
+    public Track create(TrackCreateCommand command) throws IOException, ParseException {
         Track track = new Track();
         track.setName(command.getName());
         track.setDescription(command.getDescription());
-        if (command.getAlbum() != null) {
-            albumsRepository.findById(command.getAlbum().getId()).map(item -> {
-                track.setAlbum(item);
-                return true;
-            });
-        }
+        track.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse(command.getReleaseDate()));
 
-        command.getArtists().forEach(item -> {
-            track.getArtists().add(artistsRepository.getOne(item.getId()));
+        albumsRepository.findById(command.getAlbum()).ifPresent(track::setAlbum);
+
+        Arrays.stream(command.getArtists()).forEach(id -> {
+            track.getArtists().add(artistsRepository.getOne(id));
         });
-        command.getCategories().forEach(item -> {
-            track.getCategories().add(categoryRepository.getOne(item.getId()));
+        Arrays.stream(command.getCategories()).forEach(id -> {
+            track.getCategories().add(categoryRepository.getOne(id));
         });
 
         track.setPhotoUri(savePhoto(command.getPhotoFile()));
-//        track.setTrackUri(FileHelper.saveFile(command.getTrackFile()));
-        track.setTrackText(command.getTrackText());
+        track.setTrackUri(saveTrack(command.getTrackFile()));
+        // track.setTrackText(command.getTrackText());
         track.setType(TrackTypes.valueOf(command.getType()));
         tracksRepository.save(track);
         return track;
@@ -143,6 +143,7 @@ public class TracksService {
         oldTrack.setArtists(command.getArtists());
         oldTrack.setCategories(command.getCategories());
         oldTrack.setPhotoUri(savePhoto(command.getPhotoFile()));
+        oldTrack.setTrackUri(saveTrack(command.getTrackFile()));
         oldTrack.setTrackText(command.getTrackText());
         oldTrack.setType(TrackTypes.valueOf(command.getType()));
         return oldTrack;
@@ -158,9 +159,9 @@ public class TracksService {
             }
 
             String uuidFile = UUID.randomUUID().toString();
-            String resultFilename = uuidFile + "." + file.getOriginalFilename();
+            String resultFilename = uuidFile;
 
-            file.transferTo(new File(uploadPath + "/images/tracks" + resultFilename));
+            file.transferTo(new File(uploadPath + "/images/tracks/" + resultFilename));
 
             return resultFilename;
         } else {
@@ -178,9 +179,49 @@ public class TracksService {
             }
 
             String uuidFile = UUID.randomUUID().toString();
-            String resultFilename = uuidFile + "." + file.getOriginalFilename();
+            String resultFilename = uuidFile;
 
             file.transferTo(new File(uploadPath + "/images/tracks/" + resultFilename));
+
+            return resultFilename;
+        } else {
+            return Strings.EMPTY;
+        }
+    }
+
+    public String saveTrack(MultipartFile file) throws IOException {
+        if (file != null && !Objects.requireNonNull(file.getOriginalFilename()).isEmpty()) {
+            System.out.println(uploadPath);
+            File uploadDir = new File(uploadPath);
+
+            if (!uploadDir.exists()) {
+                uploadDir.mkdir();
+            }
+
+            String uuidFile = UUID.randomUUID().toString();
+            String resultFilename = uuidFile;
+
+            file.transferTo(new File(uploadPath + "/tracks/" + resultFilename));
+
+            return resultFilename;
+        } else {
+            return Strings.EMPTY;
+        }
+    }
+
+    public String updateTrack(int id, MultipartFile file) throws IOException {
+        if (file != null && !Objects.requireNonNull(file.getOriginalFilename()).isEmpty()) {
+            System.out.println(uploadPath);
+            File uploadDir = new File(uploadPath);
+
+            if (!uploadDir.exists()) {
+                uploadDir.mkdir();
+            }
+
+            String uuidFile = UUID.randomUUID().toString();
+            String resultFilename = uuidFile;
+
+            file.transferTo(new File(uploadPath + "/tracks/" + resultFilename));
 
             return resultFilename;
         } else {

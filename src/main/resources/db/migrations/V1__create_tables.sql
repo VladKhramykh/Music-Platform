@@ -106,6 +106,7 @@ create table tracks
     description        nvarchar(255),
     name               nvarchar(255),
     photo_uri          nvarchar(255),
+    track_uri          varchar(255),
     published          bit not null,
     release_date       datetime2,
     track_text         nvarchar(255),
