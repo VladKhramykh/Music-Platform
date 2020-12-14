@@ -2,6 +2,7 @@ package com.khramykh.platform.application.repositories;
 
 import com.khramykh.platform.domain.entities.Artist;
 import com.khramykh.platform.domain.entities.Track;
+import com.khramykh.platform.domain.entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,9 +15,9 @@ public interface TracksRepository extends PagingAndSortingRepository<Track, Inte
     Page<Track> findByPublished(boolean published, Pageable pageable);
 
     Page<Track> findByNameContaining(String name, Pageable pageable);
-
-    @Query("select t from Track t where ?1 member of t.artists")
-    Page<Track> findByArtists(Artist artist, Pageable pageable);
+    Page<Track> findAllByOrderByCreatedDateDesc(Pageable pageable);
+    Page<Track> findAllByLikesContains(User user, Pageable pageable);
+    Page<Track> findAllByArtistsContains(Artist artist, Pageable pageable);
 
     List<Track> findByAlbum_Id(int id);
 }

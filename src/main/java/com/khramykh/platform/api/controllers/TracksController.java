@@ -10,12 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/api/tracks")
@@ -26,6 +29,12 @@ public class TracksController {
     @GetMapping
     public ResponseEntity getAll(@RequestParam int pageNum, @RequestParam int pageSize, @RequestParam TrackSort trackSort) {
         Page<Track> trackPage = tracksService.getTracksByPage(pageNum, pageSize, trackSort);
+        return ResponseEntity.ok().body(trackPage);
+    }
+
+    @GetMapping("/favourite")
+    public ResponseEntity getAll(@AuthenticationPrincipal UserDetails userDetails, @RequestParam int pageNum, @RequestParam int pageSize, @RequestParam TrackSort trackSort) {
+        Page<Track> trackPage = tracksService.getFavouriteTracksByUser(userDetails.getUsername(), pageNum, pageSize, trackSort);
         return ResponseEntity.ok().body(trackPage);
     }
 
@@ -49,7 +58,7 @@ public class TracksController {
 
     @GetMapping("/artist")
     public ResponseEntity getTracksByArtistId(@RequestParam Integer artistId, @RequestParam int pageNum, @RequestParam int pageSize, TrackSort trackSort) {
-        Page trackPage = tracksService.getTrackByArtist(artistId, pageNum, pageSize, trackSort);
+        Page trackPage = tracksService.getTracksByArtist(artistId, pageNum, pageSize, trackSort);
         return ResponseEntity.ok().body(trackPage);
     }
 
@@ -59,16 +68,16 @@ public class TracksController {
         return ResponseEntity.ok().body(trackPage);
     }
 
+    @GetMapping("/last")
+    public ResponseEntity getLastReleases(@RequestParam int pageNum, @RequestParam int pageSize, @RequestParam TrackSort trackSort) {
+        Page trackPage = tracksService.getLastReleases(pageNum, pageSize, trackSort);
+        return ResponseEntity.ok().body(trackPage);
+    }
+
     @GetMapping("/types")
     public ResponseEntity getTrackTypes() {
         return ResponseEntity.ok().body(TrackTypes.values());
     }
-
-//    @GetMapping
-//    public ResponseEntity getOneByName(@RequestParam String name, @RequestParam int pageNum, @RequestParam int pageSize) {
-//        Page trackPage = tracksService.getTrackByName(name, pageNum, pageSize);
-//        return ResponseEntity.ok().body(trackPage);
-//    }
 
     @PostMapping("/photo")
     public ResponseEntity setPhoto(@RequestParam int id, @RequestParam(name = "file") MultipartFile file) throws IOException {
@@ -88,18 +97,12 @@ public class TracksController {
         return ResponseEntity.ok().body(updated);
     }
 
-//    @PostMapping(produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public ResponseEntity create(@RequestBody TrackCreateCommand command) throws IOException, ParseException {
-//        Track created = tracksService.create(command);
-//        return ResponseEntity.ok().body(created);
-//    }
-
     @PostMapping(produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity create(
             @RequestParam(name = "name") String name,
             @RequestParam(name = "description") String description,
             @RequestParam(name = "type") String type,
-            @RequestParam(name = "album") int album,
+            @RequestParam(name = "album") Optional<Integer> album,
             @RequestParam(name = "trackText") String trackText,
             @RequestParam(name = "categories") int[] categories,
             @RequestParam(name = "releaseDate") String releaseDate,
@@ -111,7 +114,7 @@ public class TracksController {
         command.setName(name);
         command.setDescription(description);
         command.setType(type);
-        command.setAlbum(album);
+        album.ifPresent(command::setAlbum);
         command.setTrackText(trackText);
         command.setCategories(categories);
         command.setReleaseDate(releaseDate);

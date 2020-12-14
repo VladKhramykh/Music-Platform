@@ -2,12 +2,14 @@ package com.khramykh.platform.application.tracksApi;
 
 import com.khramykh.platform.application.commons.sort.TrackSort;
 import com.khramykh.platform.application.exceptions.ResourceNotFoundException;
+import com.khramykh.platform.application.exceptions.UserNotFoundException;
 import com.khramykh.platform.application.repositories.*;
 import com.khramykh.platform.application.tracksApi.commands.TrackCreateCommand;
 import com.khramykh.platform.application.tracksApi.commands.TrackUpdateCommand;
 import com.khramykh.platform.domain.commons.enums.TrackTypes;
 import com.khramykh.platform.domain.entities.Artist;
 import com.khramykh.platform.domain.entities.Track;
+import com.khramykh.platform.domain.entities.User;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,9 +52,9 @@ public class TracksService {
         return tracksRepository.findByNameContaining(name, PageRequest.of(pageNum, pageSize, getSortType(trackSort)));
     }
 
-    public Page<Track> getTrackByArtist(int id, int pageNum, int pageSize, TrackSort trackSort) {
+    public Page<Track> getTracksByArtist(int id, int pageNum, int pageSize, TrackSort trackSort) {
         Artist artist = artistsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException((id)));
-        return tracksRepository.findByArtists(artist, PageRequest.of(pageNum, pageSize, getSortType(trackSort)));
+        return tracksRepository.findAllByArtistsContains(artist, PageRequest.of(pageNum, pageSize, getSortType(trackSort)));
     }
 
     public Page<Track> getTracksByPage(int pageNum, int pageSize, TrackSort trackSort) {
@@ -142,25 +144,30 @@ public class TracksService {
             oldTrack.setAlbum(command.getAlbum());
         oldTrack.setArtists(command.getArtists());
         oldTrack.setCategories(command.getCategories());
-        oldTrack.setPhotoUri(savePhoto(command.getPhotoFile()));
-        oldTrack.setTrackUri(saveTrack(command.getTrackFile()));
+        if (command.getPhotoFile() != null) {
+            oldTrack.setPhotoUri(savePhoto(command.getPhotoFile()));
+        }
+        if (command.getTrackFile() != null) {
+            oldTrack.setTrackUri(saveTrack(command.getTrackFile()));
+        }
         oldTrack.setTrackText(command.getTrackText());
         oldTrack.setType(TrackTypes.valueOf(command.getType()));
         return oldTrack;
     }
 
     public String savePhoto(MultipartFile file) throws IOException {
+        return getFileString(file);
+    }
+
+    private String getFileString(MultipartFile file) throws IOException {
         if (file != null && !Objects.requireNonNull(file.getOriginalFilename()).isEmpty()) {
-            System.out.println(uploadPath);
+            String resultFilename;
             File uploadDir = new File(uploadPath);
 
             if (!uploadDir.exists()) {
                 uploadDir.mkdir();
             }
-
-            String uuidFile = UUID.randomUUID().toString();
-            String resultFilename = uuidFile;
-
+            resultFilename = UUID.randomUUID().toString();
             file.transferTo(new File(uploadPath + "/images/tracks/" + resultFilename));
 
             return resultFilename;
@@ -170,26 +177,18 @@ public class TracksService {
     }
 
     public String updatePhoto(int id, MultipartFile file) throws IOException {
-        if (file != null && !Objects.requireNonNull(file.getOriginalFilename()).isEmpty()) {
-            System.out.println(uploadPath);
-            File uploadDir = new File(uploadPath);
-
-            if (!uploadDir.exists()) {
-                uploadDir.mkdir();
-            }
-
-            String uuidFile = UUID.randomUUID().toString();
-            String resultFilename = uuidFile;
-
-            file.transferTo(new File(uploadPath + "/images/tracks/" + resultFilename));
-
-            return resultFilename;
-        } else {
-            return Strings.EMPTY;
-        }
+        return getFileString(file);
     }
 
     public String saveTrack(MultipartFile file) throws IOException {
+        return getFileUriString(file);
+    }
+
+    public String updateTrack(int id, MultipartFile file) throws IOException {
+        return getFileUriString(file);
+    }
+
+    private String getFileUriString(MultipartFile file) throws IOException {
         if (file != null && !Objects.requireNonNull(file.getOriginalFilename()).isEmpty()) {
             System.out.println(uploadPath);
             File uploadDir = new File(uploadPath);
@@ -209,23 +208,12 @@ public class TracksService {
         }
     }
 
-    public String updateTrack(int id, MultipartFile file) throws IOException {
-        if (file != null && !Objects.requireNonNull(file.getOriginalFilename()).isEmpty()) {
-            System.out.println(uploadPath);
-            File uploadDir = new File(uploadPath);
+    public Page<Track> getLastReleases(int pageNum, int pageSize, TrackSort trackSort) {
+        return this.tracksRepository.findAllByOrderByCreatedDateDesc(PageRequest.of(pageNum, pageSize, getSortType(trackSort)));
+    }
 
-            if (!uploadDir.exists()) {
-                uploadDir.mkdir();
-            }
-
-            String uuidFile = UUID.randomUUID().toString();
-            String resultFilename = uuidFile;
-
-            file.transferTo(new File(uploadPath + "/tracks/" + resultFilename));
-
-            return resultFilename;
-        } else {
-            return Strings.EMPTY;
-        }
+    public Page<Track> getFavouriteTracksByUser(String username, int pageNum, int pageSize, TrackSort trackSort) {
+        User user = usersRepository.findByEmailIgnoreCase(username).orElseThrow(() -> new UserNotFoundException());
+        return this.tracksRepository.findAllByLikesContains(user, PageRequest.of(pageNum, pageSize, getSortType(trackSort)));
     }
 }
