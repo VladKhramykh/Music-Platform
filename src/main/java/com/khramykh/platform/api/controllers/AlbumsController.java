@@ -9,6 +9,8 @@ import com.khramykh.platform.domain.entities.Album;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,6 +47,12 @@ public class AlbumsController {
         return ResponseEntity.ok().body(albums);
     }
 
+    @GetMapping("/favourite")
+    public ResponseEntity getFavouriteAlbums(@AuthenticationPrincipal UserDetails userDetails, @RequestParam int pageNum, @RequestParam int pageSize, @RequestParam AlbumSort albumSort) {
+        Page<Album> albumPage = albumsService.getFavouriteAlbumsByUser(userDetails.getUsername(), pageNum, pageSize, albumSort);
+        return ResponseEntity.ok().body(albumPage);
+    }
+
     @PostMapping("/photo")
     public ResponseEntity setPhoto(@RequestParam int id, @RequestParam(name = "file") MultipartFile file) throws IOException {
         String photoUrl = albumsService.updatePhoto(id, file);
@@ -53,15 +61,26 @@ public class AlbumsController {
 
 
     @GetMapping("/like")
-    public ResponseEntity like(@RequestParam int trackId, @RequestParam int userId) {
-        albumsService.like(trackId, userId);
+    public ResponseEntity like(@RequestParam int albumId, @RequestParam int userId) {
+        albumsService.like(albumId, userId);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/dislike")
-    public ResponseEntity dislike(@RequestParam int trackId, @RequestParam int userId) {
-        albumsService.dislike(trackId, userId);
+    public ResponseEntity dislike(@RequestParam int albumId, @RequestParam int userId) {
+        albumsService.dislike(albumId, userId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/last")
+    public ResponseEntity getLastReleases(@RequestParam(required = false) Integer artistId, @RequestParam int pageNum, @RequestParam int pageSize) {
+        Page<Album> page;
+        if (artistId != null) {
+            page = albumsService.getLastReleasesByArtist(artistId, pageNum, pageSize);
+        } else {
+            page = albumsService.getLastReleases(pageNum, pageSize);
+        }
+        return ResponseEntity.ok().body(page);
     }
 
     @DeleteMapping("{id}")

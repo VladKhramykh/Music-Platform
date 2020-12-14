@@ -4,12 +4,14 @@ import com.khramykh.platform.application.albumsApi.commands.AlbumCreateCommand;
 import com.khramykh.platform.application.albumsApi.commands.AlbumUpdateCommand;
 import com.khramykh.platform.application.commons.sort.AlbumSort;
 import com.khramykh.platform.application.exceptions.ResourceNotFoundException;
+import com.khramykh.platform.application.exceptions.UserNotFoundException;
 import com.khramykh.platform.application.repositories.AlbumsRepository;
 import com.khramykh.platform.application.repositories.ArtistsRepository;
 import com.khramykh.platform.application.repositories.UsersRepository;
 import com.khramykh.platform.domain.commons.enums.AlbumTypes;
 import com.khramykh.platform.domain.entities.Album;
 import com.khramykh.platform.domain.entities.Artist;
+import com.khramykh.platform.domain.entities.User;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -170,5 +172,19 @@ public class AlbumsService {
         } else {
             return Strings.EMPTY;
         }
+    }
+
+    public Page<Album> getLastReleases(int pageNum, int pageSize) {
+        return albumsRepository.findByOrderByReleaseDateDesc(PageRequest.of(pageNum, pageSize));
+    }
+
+    public Page<Album> getLastReleasesByArtist(Integer artistId, int pageNum, int pageSize) {
+        Artist artist = this.artistsRepository.findById(artistId).orElseThrow(ResourceNotFoundException::new);
+        return albumsRepository.findAlbumsByArtistsContainingOrderByReleaseDateDesc(artist, PageRequest.of(pageNum, pageSize));
+    }
+
+    public Page<Album> getFavouriteAlbumsByUser(String username, int pageNum, int pageSize, AlbumSort albumSort) {
+        User user = usersRepository.findByEmailIgnoreCase(username).orElseThrow(UserNotFoundException::new);
+        return this.albumsRepository.findAllByLikesContains(user, PageRequest.of(pageNum, pageSize, getSortType(albumSort)));
     }
 }
