@@ -165,8 +165,15 @@ public class UsersService {
         oldUser.setBirthday(new SimpleDateFormat("yyyy-MM-dd").parse(command.getBirthday()));
         oldUser.setCountry(Country.valueOf(command.getCountry()));
         if (isPasswordChanged) {
-            oldUser.setHashPassword(command.getPassword());
+            oldUser.setHashPassword(passwordEncoder.encode(command.getPassword()));
         }
+        if(command.getRoles().size() != 0) {
+            oldUser.setRoles(command.getRoles());
+        } else {
+            oldUser.getRoles().clear();
+            oldUser.getRoles().add(Role.USER);
+        }
+
         oldUser.setGender(UserGender.valueOf(command.getGender()));
 
         return oldUser;
