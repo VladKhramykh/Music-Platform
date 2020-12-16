@@ -79,8 +79,8 @@ public class AlbumsService {
     private Album convertAlbumUpdateCommandToAlbum(Album oldAlbum, AlbumUpdateCommand command) throws ParseException, IOException {
         oldAlbum.setName(command.getName());
         oldAlbum.setType(AlbumTypes.valueOf(command.getType()));
+        oldAlbum.getArtists().clear();
         Arrays.stream(command.getArtists()).forEach(id -> {
-            oldAlbum.getArtists().clear();
             oldAlbum.getArtists().add(artistsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id)));
         });
         oldAlbum.setPhotoUri(saveFile(command.getFile()));

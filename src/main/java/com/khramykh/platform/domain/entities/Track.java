@@ -36,7 +36,7 @@ public class Track extends BaseEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date releaseDate;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
     @JoinColumn(name = "category_id", nullable = false)
     @JoinTable(
             name = "category_track",
@@ -49,7 +49,7 @@ public class Track extends BaseEntity {
     @JoinColumn(name = "album_id")
     private Album album;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
     @JoinTable(
             name = "atrist_track",
             joinColumns = @JoinColumn(name = "track_id"),
@@ -57,7 +57,7 @@ public class Track extends BaseEntity {
     )
     private Set<Artist> artists = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
     @JoinTable(
             name = "track_likes",
             joinColumns = {@JoinColumn(name = "track_id")},

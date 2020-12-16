@@ -98,8 +98,12 @@ public class TracksService {
             track.getCategories().add(categoryRepository.getOne(id));
         });
 
-        track.setPhotoUri(savePhoto(command.getPhotoFile()));
-        track.setTrackUri(saveTrack(command.getTrackFile()));
+        if(command.getPhotoFile() != null) {
+            track.setPhotoUri(savePhoto(command.getPhotoFile()));
+        }
+        if(command.getTrackFile() != null) {
+            track.setTrackUri(saveTrack(command.getTrackFile()));
+        }
         // track.setTrackText(command.getTrackText());
         track.setType(TrackTypes.valueOf(command.getType()));
         tracksRepository.save(track);

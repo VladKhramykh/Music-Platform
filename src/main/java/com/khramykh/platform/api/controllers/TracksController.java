@@ -88,7 +88,7 @@ public class TracksController {
     @DeleteMapping("{id}")
     public ResponseEntity delete(@PathVariable int id) {
         tracksService.removeById(id);
-        return (ResponseEntity) ResponseEntity.noContent();
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping
@@ -107,8 +107,8 @@ public class TracksController {
             @RequestParam(name = "categories") int[] categories,
             @RequestParam(name = "releaseDate") String releaseDate,
             @RequestParam(name = "artists") int[] artists,
-            @RequestParam(name = "photoFile") MultipartFile photoFile,
-            @RequestParam(name = "trackFile") MultipartFile trackFile
+            @RequestParam(name = "photoFile", required = false) MultipartFile photoFile,
+            @RequestParam(name = "trackFile", required = false) MultipartFile trackFile
     ) throws IOException, ParseException {
         TrackCreateCommand command = new TrackCreateCommand();
         command.setName(name);

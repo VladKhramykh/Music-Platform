@@ -167,7 +167,7 @@ public class UsersService {
         if (isPasswordChanged) {
             oldUser.setHashPassword(passwordEncoder.encode(command.getPassword()));
         }
-        if(command.getRoles().size() != 0) {
+        if (command.getRoles() != null && command.getRoles().size() != 0) {
             oldUser.setRoles(command.getRoles());
         } else {
             oldUser.getRoles().clear();

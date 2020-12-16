@@ -51,7 +51,7 @@ public class ArtistsController {
     @DeleteMapping("{id}")
     public ResponseEntity delete(@PathVariable int id) {
         artistsService.removeById(id);
-        return (ResponseEntity) ResponseEntity.noContent();
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping

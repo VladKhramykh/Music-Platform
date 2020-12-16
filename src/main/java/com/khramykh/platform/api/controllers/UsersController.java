@@ -44,12 +44,6 @@ public class UsersController {
         String photoUrl = usersService.updatePhoto(id, file);
         return ResponseEntity.ok().body(photoUrl);
     }
-//
-//    @GetMapping
-//    public ResponseEntity getUserByEmail(@RequestParam String email) {
-//        User page = usersService.getUserByEmail(email);
-//        return ResponseEntity.ok().body(page);
-//    }
 
     @PostMapping
     public ResponseEntity<User> create(@RequestBody UserRegistrationCommand command) throws ParseException, IOException {
@@ -67,9 +61,9 @@ public class UsersController {
     public ResponseEntity removeById(@AuthenticationPrincipal User currentUser, @PathVariable int id) {
         if (currentUser.getId() == id || currentUser.getRoles().contains(Role.ADMIN)) {
             usersService.removeById(id);
-            return (ResponseEntity) ResponseEntity.ok();
+            return ResponseEntity.noContent().build();
         } else {
-            return (ResponseEntity) ResponseEntity.status(HttpStatus.FORBIDDEN);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
 }
