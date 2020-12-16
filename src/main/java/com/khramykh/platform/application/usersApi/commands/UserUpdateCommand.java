@@ -1,5 +1,6 @@
 package com.khramykh.platform.application.usersApi.commands;
 
+import com.khramykh.platform.domain.commons.enums.Role;
 import com.khramykh.platform.domain.commons.enums.UserGender;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -20,4 +22,5 @@ public class UserUpdateCommand {
     private String gender;
     private String country;
     private String password;
+    private Set<Role> roles;
 }

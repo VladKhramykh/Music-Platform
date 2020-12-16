@@ -27,6 +27,12 @@ public class UsersController {
     @Autowired
     UsersService usersService;
 
+    @GetMapping
+    public ResponseEntity getUsersByPage(@RequestParam int pageNum, @RequestParam int pageSize, @RequestParam UserSort userSort, @RequestParam(required = false) String searchName) {
+        Page<User> page = usersService.getUsersByPage(pageNum, pageSize, userSort);
+        return ResponseEntity.ok().body(page);
+    }
+
     @GetMapping("{id}")
     public ResponseEntity getUserById(@PathVariable int id) {
         User foundUser = usersService.getUserById(id);
@@ -37,12 +43,6 @@ public class UsersController {
     public ResponseEntity setPhoto(@RequestParam int id, @RequestParam(name = "file") MultipartFile file) throws IOException {
         String photoUrl = usersService.updatePhoto(id, file);
         return ResponseEntity.ok().body(photoUrl);
-    }
-
-    @GetMapping
-    public ResponseEntity getUsersByPage(@RequestParam int pageNum, @RequestParam int pageSize, @RequestParam UserSort userSort) {
-        Page<User> page = usersService.getUsersByPage(pageNum, pageSize, userSort);
-        return ResponseEntity.ok().body(page);
     }
 //
 //    @GetMapping
