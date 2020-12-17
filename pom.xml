@@ -20,7 +20,7 @@
         <flyway.plugin.version>4.0.3</flyway.plugin.version>
         <hibernate.core.version>5.4.23.Final</hibernate.core.version>
         <hibernate-jpa-2.1-api.version>1.0.2.Final</hibernate-jpa-2.1-api.version>
-        <flyway.version>4.0.3</flyway.version>
+        <flyway.version>7.3.2</flyway.version>
         <io.jsonwebtoken.version>0.9.1</io.jsonwebtoken.version>
         <javax.persistence.version>1.0</javax.persistence.version>
         <io.springfox.springfox-swagger-ui.version>3.0.0</io.springfox.springfox-swagger-ui.version>
@@ -87,10 +87,11 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.flywaydb</groupId>-->
-<!--            <artifactId>flyway-core</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>${flyway.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
@@ -143,34 +144,34 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>${flyway.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>migrate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</driver>
+                    <url>jdbc:sqlserver://localhost:1433;database=MusicPlatform</url>
+                    <user>SA</user>
+                    <password>Password_01</password>
+                    <baselineOnMigrate>true</baselineOnMigrate>
+                    <locations>
+                        <location>
+                            classpath:db/migration
+                        </location>
+                    </locations>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>org.flywaydb</groupId>-->
-<!--                <artifactId>flyway-maven-plugin</artifactId>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>generate-sources</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>migrate</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--                <configuration>-->
-<!--                    <driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</driver>-->
-<!--                    <url>jdbc:sqlserver://localhost:1433;database=MusicPlatform</url>-->
-<!--                    <user>SA</user>-->
-<!--                    <password>Password_01</password>-->
-<!--                    <baselineOnMigrate>true</baselineOnMigrate>-->
-<!--                    <schemas>MusicPlatform</schemas>-->
-<!--                    <locations>-->
-<!--                        <location>-->
-<!--                            classpath:/db/migration-->
-<!--                        </location>-->
-<!--                    </locations>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
         </plugins>
     </build>
 

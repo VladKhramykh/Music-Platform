@@ -77,9 +77,34 @@ public class TracksService {
         tracksRepository.deleteById(id);
     }
 
-    public Track update(TrackUpdateCommand command) throws IOException {
-        Track oldTrack = tracksRepository.findById(command.getId()).orElseThrow(() -> new ResourceNotFoundException((command.getId())));
-        Track updated = tracksRepository.save(convertTrackUpdateCommandToTrack(oldTrack, command));
+    public Track update(TrackUpdateCommand command) throws IOException, ParseException {
+        Track track = tracksRepository.findById(command.getId()).orElseThrow(ResourceNotFoundException::new);
+        track.setName(command.getName());
+        track.setDescription(command.getDescription());
+        track.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse(command.getReleaseDate()));
+
+        albumsRepository.findById(command.getAlbum()).ifPresent(track::setAlbum);
+
+        Arrays.stream(command.getArtists()).forEach(id -> {
+            track.getArtists().add(artistsRepository.getOne(id));
+        });
+        Arrays.stream(command.getCategories()).forEach(id -> {
+            track.getCategories().add(categoryRepository.getOne(id));
+        });
+
+        if (command.getPhotoFile() != null) {
+            track.setPhotoUri(savePhoto(command.getPhotoFile()));
+        }
+        if (command.getTrackFile() != null) {
+            track.setTrackUri(saveTrack(command.getTrackFile()));
+        }
+        // track.setTrackText(command.getTrackText());
+        track.setType(TrackTypes.valueOf(command.getType()));
+        if(track.getType().equals(TrackTypes.MUSIC_TRACK_SINGLE)) {
+            track.setAlbum(null);
+        }
+
+        Track updated = tracksRepository.save(track);
         return updated;
     }
 
@@ -98,10 +123,10 @@ public class TracksService {
             track.getCategories().add(categoryRepository.getOne(id));
         });
 
-        if(command.getPhotoFile() != null) {
+        if (command.getPhotoFile() != null) {
             track.setPhotoUri(savePhoto(command.getPhotoFile()));
         }
-        if(command.getTrackFile() != null) {
+        if (command.getTrackFile() != null) {
             track.setTrackUri(saveTrack(command.getTrackFile()));
         }
         // track.setTrackText(command.getTrackText());
@@ -139,24 +164,6 @@ public class TracksService {
             usersRepository.findById(userId).map(user -> track.getLikes().remove(user));
             return tracksRepository.save(track);
         });
-    }
-
-    private Track convertTrackUpdateCommandToTrack(Track oldTrack, TrackUpdateCommand command) throws IOException {
-        oldTrack.setName(command.getName());
-        oldTrack.setDescription(command.getDescription());
-        if (command.getAlbum() != null)
-            oldTrack.setAlbum(command.getAlbum());
-        oldTrack.setArtists(command.getArtists());
-        oldTrack.setCategories(command.getCategories());
-        if (command.getPhotoFile() != null) {
-            oldTrack.setPhotoUri(savePhoto(command.getPhotoFile()));
-        }
-        if (command.getTrackFile() != null) {
-            oldTrack.setTrackUri(saveTrack(command.getTrackFile()));
-        }
-        oldTrack.setTrackText(command.getTrackText());
-        oldTrack.setType(TrackTypes.valueOf(command.getType()));
-        return oldTrack;
     }
 
     public String savePhoto(MultipartFile file) throws IOException {

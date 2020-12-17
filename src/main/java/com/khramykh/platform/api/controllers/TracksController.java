@@ -92,7 +92,31 @@ public class TracksController {
     }
 
     @PutMapping
-    public ResponseEntity update(@RequestBody TrackUpdateCommand command) throws IOException {
+    public ResponseEntity update(
+            @RequestParam(name = "id") int id,
+            @RequestParam(name = "name") String name,
+            @RequestParam(name = "description") String description,
+            @RequestParam(name = "type") String type,
+            @RequestParam(name = "album", required = false) Optional<Integer> album,
+            @RequestParam(name = "trackText") String trackText,
+            @RequestParam(name = "categories") int[] categories,
+            @RequestParam(name = "releaseDate") String releaseDate,
+            @RequestParam(name = "artists") int[] artists,
+            @RequestParam(name = "photoFile", required = false) MultipartFile photoFile,
+            @RequestParam(name = "trackFile", required = false) MultipartFile trackFile
+    ) throws IOException, ParseException {
+        TrackUpdateCommand command = new TrackUpdateCommand();
+        command.setId(id);
+        command.setName(name);
+        command.setDescription(description);
+        command.setType(type);
+        album.ifPresent(command::setAlbum);
+        command.setTrackText(trackText);
+        command.setCategories(categories);
+        command.setReleaseDate(releaseDate);
+        command.setArtists(artists);
+        command.setPhotoFile(photoFile);
+        command.setTrackFile(trackFile);
         Track updated = tracksService.update(command);
         return ResponseEntity.ok().body(updated);
     }
@@ -102,7 +126,7 @@ public class TracksController {
             @RequestParam(name = "name") String name,
             @RequestParam(name = "description") String description,
             @RequestParam(name = "type") String type,
-            @RequestParam(name = "album") Optional<Integer> album,
+            @RequestParam(name = "album", required = false) Optional<Integer> album,
             @RequestParam(name = "trackText") String trackText,
             @RequestParam(name = "categories") int[] categories,
             @RequestParam(name = "releaseDate") String releaseDate,
