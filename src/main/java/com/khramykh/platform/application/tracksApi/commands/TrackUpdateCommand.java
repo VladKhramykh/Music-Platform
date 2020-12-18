@@ -17,7 +17,6 @@ public class TrackUpdateCommand {
     private MultipartFile photoFile;
     private MultipartFile trackFile;
     private String trackText;
-    private boolean published;
     private int[] categories;
     private int album;
     private int[] artists;

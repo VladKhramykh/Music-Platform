@@ -100,7 +100,7 @@ public class TracksService {
         }
         // track.setTrackText(command.getTrackText());
         track.setType(TrackTypes.valueOf(command.getType()));
-        if(track.getType().equals(TrackTypes.MUSIC_TRACK_SINGLE)) {
+        if (track.getType().equals(TrackTypes.MUSIC_TRACK_SINGLE)) {
             track.setAlbum(null);
         }
 

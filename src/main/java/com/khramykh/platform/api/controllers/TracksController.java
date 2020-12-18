@@ -97,7 +97,7 @@ public class TracksController {
             @RequestParam(name = "name") String name,
             @RequestParam(name = "description") String description,
             @RequestParam(name = "type") String type,
-            @RequestParam(name = "album", required = false) Optional<Integer> album,
+            @RequestParam(name = "album") Optional<Integer> album,
             @RequestParam(name = "trackText") String trackText,
             @RequestParam(name = "categories") int[] categories,
             @RequestParam(name = "releaseDate") String releaseDate,

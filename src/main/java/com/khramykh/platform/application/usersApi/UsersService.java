@@ -26,10 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UsersService {
@@ -170,8 +167,7 @@ public class UsersService {
         if (command.getRoles() != null && command.getRoles().size() != 0) {
             oldUser.setRoles(command.getRoles());
         } else {
-            oldUser.getRoles().clear();
-            oldUser.getRoles().add(Role.USER);
+            oldUser.setRoles(Collections.singleton((Role.USER)));
         }
 
         oldUser.setGender(UserGender.valueOf(command.getGender()));
