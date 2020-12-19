@@ -53,13 +53,6 @@ public class AlbumsController {
         return ResponseEntity.ok().body(albumPage);
     }
 
-    @PostMapping("/photo")
-    public ResponseEntity setPhoto(@RequestParam int id, @RequestParam(name = "file") MultipartFile file) throws IOException {
-        String photoUrl = albumsService.updatePhoto(id, file);
-        return ResponseEntity.ok().body(photoUrl);
-    }
-
-
     @GetMapping("/like")
     public ResponseEntity like(@RequestParam int albumId, @RequestParam int userId) {
         albumsService.like(albumId, userId);
@@ -90,13 +83,43 @@ public class AlbumsController {
     }
 
     @PutMapping
-    public ResponseEntity update(@RequestBody AlbumUpdateCommand command) throws ParseException, IOException {
+    public ResponseEntity update(
+            @RequestParam(name = "id") int id,
+            @RequestParam(name = "name") String name,
+            @RequestParam(name = "description") String description,
+            @RequestParam(name = "type") String type,
+            @RequestParam(name = "releaseDate") String releaseDate,
+            @RequestParam(name = "artists") int[] artists,
+            @RequestParam(name = "photoFile", required = false) MultipartFile photoFile
+    ) throws ParseException, IOException {
+        AlbumUpdateCommand command = new AlbumUpdateCommand();
+        command.setId(id);
+        command.setName(name);
+        command.setDescription(description);
+        command.setType(type);
+        command.setReleaseDate(releaseDate);
+        command.setArtists(artists);
+        command.setPhotoFile(photoFile);
         Album updated = albumsService.update(command);
         return ResponseEntity.ok().body(updated);
     }
 
     @PostMapping
-    public ResponseEntity create(@RequestBody AlbumCreateCommand command) throws ParseException, IOException {
+    public ResponseEntity create(
+            @RequestParam(name = "name") String name,
+            @RequestParam(name = "description") String description,
+            @RequestParam(name = "type") String type,
+            @RequestParam(name = "releaseDate") String releaseDate,
+            @RequestParam(name = "artists") int[] artists,
+            @RequestParam(name = "photoFile", required = false) MultipartFile photoFile
+    ) throws ParseException, IOException {
+        AlbumCreateCommand command = new AlbumCreateCommand();
+        command.setName(name);
+        command.setDescription(description);
+        command.setType(type);
+        command.setReleaseDate(releaseDate);
+        command.setArtists(artists);
+        command.setPhotoFile(photoFile);
         Album created = albumsService.create(command);
         return ResponseEntity.ok().body(created);
     }

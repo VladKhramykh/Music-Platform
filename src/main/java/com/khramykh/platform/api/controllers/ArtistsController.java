@@ -7,10 +7,14 @@ import com.khramykh.platform.application.commons.sort.ArtistSort;
 import com.khramykh.platform.domain.entities.Artist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.text.ParseException;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/api/artists")
@@ -55,13 +59,35 @@ public class ArtistsController {
     }
 
     @PutMapping
-    public ResponseEntity update(@RequestBody ArtistUpdateCommand command) throws ParseException {
+    public ResponseEntity update(
+            @RequestParam(name = "id") int id,
+            @RequestParam(name = "name") String name,
+            @RequestParam(name = "description") String description,
+            @RequestParam(name = "createdDate") String createdDate,
+            @RequestParam(name = "photoFile", required = false) MultipartFile photoFile
+    ) throws ParseException, IOException {
+        ArtistUpdateCommand command = new ArtistUpdateCommand();
+        command.setId(id);
+        command.setName(name);
+        command.setDescription(description);
+        command.setCreatedDate(createdDate);
+        command.setPhotoFile(photoFile);
         Artist updated = artistsService.update(command);
         return ResponseEntity.ok().body(updated);
     }
 
-    @PostMapping
-    public ResponseEntity create(@RequestBody ArtistCreateCommand command) throws ParseException {
+    @PostMapping(produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity create(
+            @RequestParam(name = "name") String name,
+            @RequestParam(name = "description") String description,
+            @RequestParam(name = "createdDate") String createdDate,
+            @RequestParam(name = "photoFile", required = false) MultipartFile photoFile
+    ) throws ParseException, IOException {
+        ArtistCreateCommand command = new ArtistCreateCommand();
+        command.setName(name);
+        command.setDescription(description);
+        command.setCreatedDate(createdDate);
+        command.setPhotoFile(photoFile);
         Artist created = artistsService.create(command);
         return ResponseEntity.ok().body(created);
     }

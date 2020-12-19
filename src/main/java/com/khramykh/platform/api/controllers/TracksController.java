@@ -79,12 +79,6 @@ public class TracksController {
         return ResponseEntity.ok().body(TrackTypes.values());
     }
 
-    @PostMapping("/photo")
-    public ResponseEntity setPhoto(@RequestParam int id, @RequestParam(name = "file") MultipartFile file) throws IOException {
-        String photoUrl = tracksService.updatePhoto(id, file);
-        return ResponseEntity.ok().body(photoUrl);
-    }
-
     @DeleteMapping("{id}")
     public ResponseEntity delete(@PathVariable int id) {
         tracksService.removeById(id);

@@ -25,6 +25,7 @@ public class Artist extends BaseEntity {
     @NotNull
     @NotEmpty
     private String description;
+    private String photoUri;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
