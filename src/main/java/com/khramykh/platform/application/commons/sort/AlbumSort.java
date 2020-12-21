@@ -3,5 +3,7 @@ package com.khramykh.platform.application.commons.sort;
 public enum AlbumSort {
     ID_DESC, ID_ASC,
     NAME_DESC, NAME_ASC,
-    RELEASE_DATE_DESC, RELEASE_DATE_ASC
+    RELEASEDATE_DESC, RELEASEDATE_ASC,
+    DESCRIPTION_DESC, DESCRIPTION_ASC,
+    TYPE_DESC, TYPE_ASC,
 }

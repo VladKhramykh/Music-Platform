@@ -26,8 +26,18 @@ public class AlbumsController {
     AlbumsService albumsService;
 
     @GetMapping
-    public ResponseEntity getPage(@RequestParam int pageNum, @RequestParam int pageSize, @RequestParam AlbumSort albumSort) {
-        Page<Album> albumsPage = albumsService.getAlbumsByPage(pageNum, pageSize, albumSort);
+    public ResponseEntity getPage(
+            @RequestParam int pageNum,
+            @RequestParam int pageSize,
+            @RequestParam(required = false) String filter,
+            @RequestParam AlbumSort albumSort) {
+        Page<Album> albumsPage;
+        if(filter != null){
+            albumsPage = albumsService.getAlbumByNameContaining(filter, pageNum, pageSize, albumSort);
+        } else {
+            albumsPage = albumsService.getAlbumsByPage(pageNum, pageSize, albumSort);
+        }
+
         return ResponseEntity.ok().body(albumsPage);
     }
 

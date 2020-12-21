@@ -100,4 +100,8 @@ public class CategoriesService {
         oldCategory.setDescription(command.getDescription());
         return oldCategory;
     }
+
+    public Page<Category> getCategoriesByNameAndPage(int pageNum, int pageSize, String filter, CategorySort categorySort) {
+        return categoryRepository.findByNameContaining(filter, PageRequest.of(pageNum, pageSize, getSortType(categorySort)));
+    }
 }

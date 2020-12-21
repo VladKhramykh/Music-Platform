@@ -20,8 +20,17 @@ public class CategoriesController {
     CategoriesService categoriesService;
 
     @GetMapping
-    public ResponseEntity getAll(@RequestParam int pageNum, @RequestParam int pageSize, @RequestParam CategorySort categorySort) {
-        Page<Category> categoryPage = categoriesService.getCategoriesByPage(pageNum, pageSize, categorySort);
+    public ResponseEntity getAll(
+            @RequestParam int pageNum,
+            @RequestParam int pageSize,
+            @RequestParam(required = false) String filter,
+            @RequestParam CategorySort categorySort) {
+        Page<Category> categoryPage;
+        if(filter != null) {
+            categoryPage = categoriesService.getCategoriesByNameAndPage(pageNum, pageSize, filter, categorySort);
+        } else {
+            categoryPage = categoriesService.getCategoriesByPage(pageNum, pageSize, categorySort);
+        }
         return ResponseEntity.ok().body(categoryPage);
     }
 

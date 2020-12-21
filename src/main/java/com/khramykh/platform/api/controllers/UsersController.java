@@ -27,8 +27,18 @@ public class UsersController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity getUsersByPage(@RequestParam int pageNum, @RequestParam int pageSize, @RequestParam UserSort userSort, @RequestParam(required = false) String searchName) {
-        Page<User> page = usersService.getUsersByPage(pageNum, pageSize, userSort);
+    public ResponseEntity getUsersByPage(
+            @RequestParam int pageNum,
+            @RequestParam int pageSize,
+            @RequestParam UserSort userSort,
+            @RequestParam(required = false) String filter
+    ) {
+        Page<User> page;
+        if(filter != null) {
+            page = usersService.getUserByFilterContaining(filter, pageNum, pageSize, userSort);
+        } else {
+            page = usersService.getUsersByPage(pageNum, pageSize, userSort);
+        }
         return ResponseEntity.ok().body(page);
     }
 

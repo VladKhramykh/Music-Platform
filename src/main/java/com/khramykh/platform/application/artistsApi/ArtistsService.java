@@ -79,6 +79,14 @@ public class ArtistsService {
                 return Sort.by("id").ascending();
             case ID_DESC:
                 return Sort.by("id").descending();
+            case CREATEDDATE_ASC:
+                return Sort.by("createdDate").ascending();
+            case CREATEDDATE_DESC:
+                return Sort.by("createdDate").descending();
+            case DESCRIPTION_ASC:
+                return Sort.by("description").ascending();
+            case DESCRIPTION_DESC:
+                return Sort.by("description").descending();
             default:
                 return Sort.by("name").ascending();
         }

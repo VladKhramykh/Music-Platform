@@ -28,13 +28,28 @@ public class TracksController {
     TracksService tracksService;
 
     @GetMapping
-    public ResponseEntity getAll(@RequestParam int pageNum, @RequestParam int pageSize, @RequestParam TrackSort trackSort) {
-        Page<Track> trackPage = tracksService.getTracksByPage(pageNum, pageSize, trackSort);
+    public ResponseEntity getAll(
+            @RequestParam int pageNum,
+            @RequestParam int pageSize,
+            @RequestParam(required = false) String filter,
+            @RequestParam TrackSort trackSort
+    ) {
+        Page<Track> trackPage;
+        if (filter == null) {
+            trackPage = tracksService.getTracksByPage(pageNum, pageSize, trackSort);
+        } else {
+            trackPage = tracksService.getTrackByName(filter, pageNum, pageSize, trackSort);
+        }
         return ResponseEntity.ok().body(trackPage);
     }
 
     @GetMapping("/favourite")
-    public ResponseEntity getAll(@AuthenticationPrincipal UserDetails userDetails, @RequestParam int pageNum, @RequestParam int pageSize, @RequestParam TrackSort trackSort) {
+    public ResponseEntity getAll(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam int pageNum,
+            @RequestParam int pageSize,
+            @RequestParam TrackSort trackSort
+    ) {
         Page<Track> trackPage = tracksService.getFavouriteTracksByUser(userDetails.getUsername(), pageNum, pageSize, trackSort);
         return ResponseEntity.ok().body(trackPage);
     }

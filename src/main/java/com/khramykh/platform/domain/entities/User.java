@@ -12,11 +12,12 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -39,6 +40,7 @@ public class User extends BaseEntity {
     private String email;
 
     @NotNull(message = "{user.birthdaynotnull}")
+    @PastOrPresent
     private Date birthday;
 
     private String photoUri;

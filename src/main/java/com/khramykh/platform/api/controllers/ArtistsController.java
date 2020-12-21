@@ -22,21 +22,19 @@ import java.util.Optional;
 public class ArtistsController {
     @Autowired
     ArtistsService artistsService;
-
-    @GetMapping("/search")
-    public ResponseEntity getAllByName(
-            @RequestParam String name,
+    
+    @GetMapping
+    public ResponseEntity getAll(
             @RequestParam int pageNum,
             @RequestParam int pageSize,
-            @RequestParam ArtistSort artistSort
-    ) {
-        Page artistsPage = artistsService.getArtistByName(name, pageNum, pageSize, artistSort);
-        return ResponseEntity.ok().body(artistsPage);
-    }
-
-    @GetMapping
-    public ResponseEntity getAll(@RequestParam int pageNum, @RequestParam int pageSize, @RequestParam ArtistSort artistSort) {
-        Page<Artist> artistsPage = artistsService.getArtistsByPage(pageNum, pageSize, artistSort);
+            @RequestParam(required = false) String filter,
+            @RequestParam ArtistSort artistSort) {
+        Page<Artist> artistsPage;
+        if (filter != null) {
+            artistsPage = artistsService.getArtistByName(filter, pageNum, pageSize, artistSort);
+        } else {
+            artistsPage = artistsService.getArtistsByPage(pageNum, pageSize, artistSort);
+        }
         return ResponseEntity.ok().body(artistsPage);
     }
 

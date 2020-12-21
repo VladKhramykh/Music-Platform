@@ -150,10 +150,26 @@ public class TracksService {
                 return Sort.by("id").descending();
             case ID_ASC:
                 return Sort.by("id").ascending();
-            case RELEASE_DATE_DESC:
+            case RELEASEDATE_DESC:
                 return Sort.by("releaseDate").descending();
-            case RELEASE_DATE_ASC:
+            case RELEASEDATE_ASC:
                 return Sort.by("releaseDate").ascending();
+            case TYPE_DESC:
+                return Sort.by("type").descending();
+            case TYPE_ASC:
+                return Sort.by("type").ascending();
+            case CATEGORY_DESC:
+                return Sort.by("categories").descending();
+            case CATEGORY_ASC:
+                return Sort.by("categories").ascending();
+            case ALBUM_DESC:
+                return Sort.by("albums").descending();
+            case ALBUM_ASC:
+                return Sort.by("albums").ascending();
+            case DESCRIPTION_DESC:
+                return Sort.by("description").descending();
+            case DESCRIPTION_ASC:
+                return Sort.by("description").ascending();
             default:
                 return Sort.by("name").ascending();
         }

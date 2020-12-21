@@ -99,10 +99,18 @@ public class AlbumsService {
         switch (albumSort) {
             case NAME_DESC:
                 return Sort.by("name").descending();
-            case RELEASE_DATE_ASC:
+            case RELEASEDATE_ASC:
                 return Sort.by("releaseDate").ascending();
-            case RELEASE_DATE_DESC:
+            case RELEASEDATE_DESC:
                 return Sort.by("releaseDate").descending();
+            case DESCRIPTION_ASC:
+                return Sort.by("description").ascending();
+            case DESCRIPTION_DESC:
+                return Sort.by("description").descending();
+            case TYPE_ASC:
+                return Sort.by("type").ascending();
+            case TYPE_DESC:
+                return Sort.by("type").descending();
             case ID_ASC:
                 return Sort.by("id").ascending();
             case ID_DESC:

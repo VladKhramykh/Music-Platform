@@ -142,18 +142,26 @@ public class UsersService {
                 return Sort.by("country").ascending();
             case COUNTRY_DESC:
                 return Sort.by("country").descending();
-            case LAST_NAME_ASC:
+            case ROLES_ASC:
+                return Sort.by("roles").ascending();
+            case ROLES_DESC:
+                return Sort.by("gender").descending();
+            case GENDER_ASC:
+                return Sort.by("gender").ascending();
+            case GENDER_DESC:
+                return Sort.by("roles").descending();
+            case LASTNAME_ASC:
                 return Sort.by("lastName").ascending();
-            case LAST_NAME_DESC:
+            case LASTNAME_DESC:
                 return Sort.by("lastName").descending();
-            case FIRST_NAME_ASC:
+            case FIRSTNAME_ASC:
                 return Sort.by("firstName").ascending();
-            case FIRST_NAME_DESC:
+            case FIRSTNAME_DESC:
                 return Sort.by("firstName").descending();
-            case DATE_OF_REGISTRATION_ASC:
-                return Sort.by("dateOfRegistration").ascending();
-            case DATE_OF_REGISTRATION_DESC:
-                return Sort.by("dateOfRegistration").descending();
+            case BIRTHDAY_ASC:
+                return Sort.by("birthday").ascending();
+            case BIRTHDAY_DESC:
+                return Sort.by("birthday").descending();
             default:
                 return Sort.by("id").ascending();
         }
@@ -163,7 +171,7 @@ public class UsersService {
         oldUser.setFirstName(command.getFirstName());
         oldUser.setLastName(command.getLastName());
         if (!oldUser.getEmail().equals(command.getEmail())) {
-            if(usersRepository.findByEmailIgnoreCase(command.getEmail()).isEmpty()) {
+            if (usersRepository.findByEmailIgnoreCase(command.getEmail()).isEmpty()) {
                 oldUser.setEmail(command.getEmail());
                 oldUser.setActivationCode(UUID.randomUUID().toString());
             } else {
@@ -191,5 +199,13 @@ public class UsersService {
         user.setPhotoUri(fileHelper.getNewUri(file, FileOperations.USER_PHOTO));
         usersRepository.save(user);
         return user.getPhotoUri();
+    }
+
+    public Page<User> getUserByFilterContaining(String filter, int pageNum, int pageSize, UserSort userSort) {
+        return usersRepository
+                .findByFilterContaining(
+                        filter,
+                        PageRequest.of(pageNum, pageSize, getSortType(userSort))
+                );
     }
 }
