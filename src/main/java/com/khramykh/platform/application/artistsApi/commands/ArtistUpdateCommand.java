@@ -3,6 +3,7 @@ package com.khramykh.platform.application.artistsApi.commands;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @AllArgsConstructor
@@ -13,4 +14,5 @@ public class ArtistUpdateCommand {
     private String description;
     private boolean deleted;
     private String createdDate;
+    private MultipartFile photoFile;
 }

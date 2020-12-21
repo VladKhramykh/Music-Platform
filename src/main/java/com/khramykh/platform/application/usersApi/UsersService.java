@@ -1,6 +1,8 @@
 package com.khramykh.platform.application.usersApi;
 
 import com.khramykh.platform.application.commons.sort.UserSort;
+import com.khramykh.platform.application.commons.utils.FileHelper;
+import com.khramykh.platform.application.commons.utils.FileOperations;
 import com.khramykh.platform.application.exceptions.EmailAlreadyInUseException;
 import com.khramykh.platform.application.exceptions.UserNotFoundException;
 import com.khramykh.platform.application.repositories.UsersRepository;
@@ -22,11 +24,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UsersService {
@@ -38,6 +41,9 @@ public class UsersService {
 
     @Autowired
     private MailSender mailSender;
+
+    @Autowired
+    FileHelper fileHelper;
 
     @Value("${upload.path}")
     private String uploadPath;
@@ -86,7 +92,7 @@ public class UsersService {
         user.setFirstName(command.getFirstName());
         user.setLastName(command.getLastName());
         user.setEmail(command.getEmail());
-        user.setPhotoUri(saveFile(command.getFile()));
+        user.setPhotoUri(Strings.EMPTY);
         // TODO need to fix date persing (maybe need to change type of birthday)
         user.setBirthday(new SimpleDateFormat("yyyy-MM-dd").parse(command.getBirthday().substring(0, 10)));
         user.setGender(UserGender.valueOf(command.getGender()));
@@ -157,7 +163,12 @@ public class UsersService {
         oldUser.setFirstName(command.getFirstName());
         oldUser.setLastName(command.getLastName());
         if (!oldUser.getEmail().equals(command.getEmail())) {
-            oldUser.setActivationCode(UUID.randomUUID().toString());
+            if(usersRepository.findByEmailIgnoreCase(command.getEmail()).isEmpty()) {
+                oldUser.setEmail(command.getEmail());
+                oldUser.setActivationCode(UUID.randomUUID().toString());
+            } else {
+                throw new EmailAlreadyInUseException();
+            }
         }
         oldUser.setBirthday(new SimpleDateFormat("yyyy-MM-dd").parse(command.getBirthday()));
         oldUser.setCountry(Country.valueOf(command.getCountry()));
@@ -165,9 +176,8 @@ public class UsersService {
             oldUser.setHashPassword(passwordEncoder.encode(command.getPassword()));
         }
         if (command.getRoles() != null && command.getRoles().size() != 0) {
+            oldUser.getRoles().clear();
             oldUser.setRoles(command.getRoles());
-        } else {
-            oldUser.setRoles(Collections.singleton((Role.USER)));
         }
 
         oldUser.setGender(UserGender.valueOf(command.getGender()));
@@ -177,28 +187,9 @@ public class UsersService {
 
     public String updatePhoto(int id, MultipartFile file) throws IOException {
         User user = usersRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
-        user.setPhotoUri(saveFile(file));
+        fileHelper.deleteFile(user.getPhotoUri(), FileOperations.USER_PHOTO);
+        user.setPhotoUri(fileHelper.getNewUri(file, FileOperations.USER_PHOTO));
         usersRepository.save(user);
         return user.getPhotoUri();
-    }
-
-    public String saveFile(MultipartFile file) throws IOException {
-        if (file != null && !Objects.requireNonNull(file.getOriginalFilename()).isEmpty()) {
-            System.out.println(uploadPath);
-            File uploadDir = new File(uploadPath);
-
-            if (!uploadDir.exists()) {
-                uploadDir.mkdir();
-            }
-
-            String uuidFile = UUID.randomUUID().toString();
-            String resultFilename = uuidFile + "." + file.getOriginalFilename().replace(' ', '_');
-
-            file.transferTo(new File(uploadPath + "/images/users/" + resultFilename));
-
-            return resultFilename;
-        } else {
-            return Strings.EMPTY;
-        }
     }
 }

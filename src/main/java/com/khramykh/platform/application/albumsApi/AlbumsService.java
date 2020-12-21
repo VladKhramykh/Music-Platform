@@ -3,6 +3,8 @@ package com.khramykh.platform.application.albumsApi;
 import com.khramykh.platform.application.albumsApi.commands.AlbumCreateCommand;
 import com.khramykh.platform.application.albumsApi.commands.AlbumUpdateCommand;
 import com.khramykh.platform.application.commons.sort.AlbumSort;
+import com.khramykh.platform.application.commons.utils.FileHelper;
+import com.khramykh.platform.application.commons.utils.FileOperations;
 import com.khramykh.platform.application.exceptions.ResourceNotFoundException;
 import com.khramykh.platform.application.exceptions.UserNotFoundException;
 import com.khramykh.platform.application.repositories.AlbumsRepository;
@@ -38,8 +40,8 @@ public class AlbumsService {
     ArtistsRepository artistsRepository;
     @Autowired
     UsersRepository usersRepository;
-    @Value("${upload.path}")
-    private String uploadPath;
+    @Autowired
+    FileHelper fileHelper;
 
     public Album getAlbumById(int id) {
         return albumsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
@@ -83,7 +85,11 @@ public class AlbumsService {
         Arrays.stream(command.getArtists()).forEach(id -> {
             oldAlbum.getArtists().add(artistsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id)));
         });
-        oldAlbum.setPhotoUri(saveFile(command.getFile()));
+        if (command.getPhotoFile() != null) {
+            fileHelper.deleteFile(oldAlbum.getPhotoUri(), FileOperations.ALBUM_PHOTO);
+            oldAlbum.setPhotoUri(fileHelper.getNewUri(command.getPhotoFile(), FileOperations.ALBUM_PHOTO));
+        }
+        ;
         oldAlbum.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse(command.getReleaseDate()));
         oldAlbum.setDescription(command.getDescription());
         return oldAlbum;
@@ -113,7 +119,10 @@ public class AlbumsService {
         Arrays.stream(command.getArtists()).forEach(id -> {
             album.getArtists().add(artistsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id)));
         });
-        album.setPhotoUri(saveFile(command.getFile()));
+        if (command.getPhotoFile() != null) {
+            fileHelper.deleteFile(album.getPhotoUri(), FileOperations.ALBUM_PHOTO);
+            album.setPhotoUri(fileHelper.getNewUri(command.getPhotoFile(), FileOperations.ALBUM_PHOTO));
+        }
         album.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse(command.getReleaseDate()));
         album.setDescription(command.getDescription());
         albumsRepository.save(album);
@@ -132,46 +141,6 @@ public class AlbumsService {
             usersRepository.findById(userId).map(user -> album.getLikes().remove(user));
             return albumsRepository.save(album);
         });
-    }
-
-    public String saveFile(MultipartFile file) throws IOException {
-        if (file != null && !Objects.requireNonNull(file.getOriginalFilename()).isEmpty()) {
-            System.out.println(uploadPath);
-            File uploadDir = new File(uploadPath);
-
-            if (!uploadDir.exists()) {
-                uploadDir.mkdir();
-            }
-
-            String uuidFile = UUID.randomUUID().toString();
-            String resultFilename = uuidFile + "." + file.getOriginalFilename().replace(' ', '_');
-
-            file.transferTo(new File(uploadPath + "/images/albums/" + resultFilename));
-
-            return resultFilename;
-        } else {
-            return Strings.EMPTY;
-        }
-    }
-
-    public String updatePhoto(int id, MultipartFile file) throws IOException {
-        if (file != null && !Objects.requireNonNull(file.getOriginalFilename()).isEmpty()) {
-            System.out.println(uploadPath);
-            File uploadDir = new File(uploadPath);
-
-            if (!uploadDir.exists()) {
-                uploadDir.mkdir();
-            }
-
-            String uuidFile = UUID.randomUUID().toString();
-            String resultFilename = uuidFile + "." + file.getOriginalFilename().replace(' ', '_');
-
-            file.transferTo(new File(uploadPath + "/images/albums/" + resultFilename));
-
-            return resultFilename;
-        } else {
-            return Strings.EMPTY;
-        }
     }
 
     public Page<Album> getLastReleases(int pageNum, int pageSize) {

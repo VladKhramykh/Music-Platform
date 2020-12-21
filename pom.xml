@@ -11,7 +11,7 @@
     <groupId>com.khramykh</groupId>
     <artifactId>music-platform</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>MusicPlatform</name>
     <description>Course project for Spring Boot</description>
 
@@ -69,7 +69,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
-            <scope>provided</scope>
+<!--            <scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -150,16 +150,16 @@
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
-                        <goals>
-                            <goal>migrate</goal>
-                        </goals>
+<!--                        <goals>-->
+<!--                            <goal>migrate</goal>-->
+<!--                        </goals>-->
                     </execution>
                 </executions>
                 <configuration>
                     <driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</driver>
                     <url>jdbc:sqlserver://localhost:1433;database=MusicPlatform</url>
                     <user>SA</user>
-                    <password>Password_01</password>
+                    <password>Pasword_01</password>
                     <baselineOnMigrate>true</baselineOnMigrate>
                     <locations>
                         <location>

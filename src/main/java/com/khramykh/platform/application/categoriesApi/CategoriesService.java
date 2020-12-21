@@ -30,8 +30,8 @@ public class CategoriesService {
         return categoryRepository.findAll();
     }
 
-    public Page<Category> getCategoryByName(String name, int pageNum, int pageSize, CategorySort categorySort) {
-        return categoryRepository.findByNameContaining(name, PageRequest.of(pageNum, pageSize, getSortType(categorySort)));
+    public List<Category> getCategoriesByName(String name) {
+        return categoryRepository.findByNameContaining(name);
     }
 
     public Page<Category> getCategoriesByPage(int pageNum, int pageSize, CategorySort categorySort) {

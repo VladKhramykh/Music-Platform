@@ -3,6 +3,8 @@ package com.khramykh.platform.application.artistsApi;
 import com.khramykh.platform.application.artistsApi.commands.ArtistCreateCommand;
 import com.khramykh.platform.application.artistsApi.commands.ArtistUpdateCommand;
 import com.khramykh.platform.application.commons.sort.ArtistSort;
+import com.khramykh.platform.application.commons.utils.FileHelper;
+import com.khramykh.platform.application.commons.utils.FileOperations;
 import com.khramykh.platform.application.exceptions.ResourceNotFoundException;
 import com.khramykh.platform.application.repositories.ArtistsRepository;
 import com.khramykh.platform.application.repositories.UsersRepository;
@@ -13,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -23,6 +26,8 @@ public class ArtistsService {
     ArtistsRepository artistsRepository;
     @Autowired
     UsersRepository usersRepository;
+    @Autowired
+    FileHelper fileHelper;
 
     public Artist getArtistById(int id) {
         return artistsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
@@ -48,16 +53,19 @@ public class ArtistsService {
         artistsRepository.deleteById(id);
     }
 
-    public Artist update(ArtistUpdateCommand command) throws ParseException {
+    public Artist update(ArtistUpdateCommand command) throws ParseException, IOException {
         Artist oldArtist = artistsRepository.findById(command.getId()).orElseThrow(() -> new ResourceNotFoundException((command.getId())));
         Artist updated = artistsRepository.save(convertArtistUpdateCommandToArtist(oldArtist, command));
         return updated;
     }
 
-    public Artist create(ArtistCreateCommand command) throws ParseException {
+    public Artist create(ArtistCreateCommand command) throws ParseException, IOException {
         Artist artist = new Artist();
         artist.setName(command.getName());
         artist.setDescription(command.getDescription());
+        if (command.getPhotoFile() != null) {
+            artist.setPhotoUri(fileHelper.getNewUri(command.getPhotoFile(), FileOperations.ARTIST_PHOTO));
+        }
         artist.setCreatedDate(new SimpleDateFormat("yyyy-MM-dd").parse(command.getCreatedDate()));
         artistsRepository.save(artist);
         return artist;
@@ -76,11 +84,15 @@ public class ArtistsService {
         }
     }
 
-    private Artist convertArtistUpdateCommandToArtist(Artist oldArtist, ArtistUpdateCommand command) throws ParseException {
+    private Artist convertArtistUpdateCommandToArtist(Artist oldArtist, ArtistUpdateCommand command) throws ParseException, IOException {
         oldArtist.setName(command.getName());
         oldArtist.setDescription(command.getDescription());
         oldArtist.setCreatedDate(new SimpleDateFormat("yyyy-MM-dd").parse(command.getCreatedDate()));
         oldArtist.setDeleted(command.isDeleted());
+        if (command.getPhotoFile() != null) {
+            fileHelper.deleteFile(oldArtist.getPhotoUri(), FileOperations.ARTIST_PHOTO);
+            oldArtist.setPhotoUri(fileHelper.getNewUri(command.getPhotoFile(), FileOperations.ARTIST_PHOTO));
+        }
         return oldArtist;
     }
 

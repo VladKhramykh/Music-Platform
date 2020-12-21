@@ -1,4 +1,4 @@
-package com.khramykh.platform.domain.commons;
+package com.khramykh.platform.persistence;
 
 public class Views {
     public interface ForTrack {}

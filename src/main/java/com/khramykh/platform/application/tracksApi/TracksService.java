@@ -1,6 +1,8 @@
 package com.khramykh.platform.application.tracksApi;
 
 import com.khramykh.platform.application.commons.sort.TrackSort;
+import com.khramykh.platform.application.commons.utils.FileHelper;
+import com.khramykh.platform.application.commons.utils.FileOperations;
 import com.khramykh.platform.application.exceptions.ResourceNotFoundException;
 import com.khramykh.platform.application.exceptions.UserNotFoundException;
 import com.khramykh.platform.application.repositories.*;
@@ -40,6 +42,8 @@ public class TracksService {
     CategoriesRepository categoryRepository;
     @Autowired
     UsersRepository usersRepository;
+    @Autowired
+    FileHelper fileHelper;
 
     @Value("${upload.path}")
     private String uploadPath;
@@ -93,9 +97,12 @@ public class TracksService {
         });
 
         if (command.getPhotoFile() != null) {
-            track.setPhotoUri(savePhoto(command.getPhotoFile()));
+            fileHelper.deleteFile(track.getPhotoUri(), FileOperations.TRACK_PHOTO);
+            track.setPhotoUri(fileHelper.getNewUri(command.getPhotoFile(), FileOperations.TRACK_PHOTO));
         }
         if (command.getTrackFile() != null) {
+            fileHelper.deleteFile(track.getTrackUri(), FileOperations.TRACK_FILE);
+            track.setTrackUri(fileHelper.getNewUri(command.getTrackFile(), FileOperations.TRACK_FILE));
             track.setTrackUri(saveTrack(command.getTrackFile()));
         }
         // track.setTrackText(command.getTrackText());
@@ -124,12 +131,12 @@ public class TracksService {
         });
 
         if (command.getPhotoFile() != null) {
-            track.setPhotoUri(savePhoto(command.getPhotoFile()));
+            track.setPhotoUri(fileHelper.getNewUri(command.getPhotoFile(), FileOperations.TRACK_PHOTO));
         }
         if (command.getTrackFile() != null) {
-            track.setTrackUri(saveTrack(command.getTrackFile()));
+            track.setTrackUri(fileHelper.getNewUri(command.getTrackFile(), FileOperations.TRACK_FILE));
         }
-        // track.setTrackText(command.getTrackText());
+        track.setTrackText(command.getTrackText());
         track.setType(TrackTypes.valueOf(command.getType()));
         tracksRepository.save(track);
         return track;
@@ -167,56 +174,11 @@ public class TracksService {
     }
 
     public String savePhoto(MultipartFile file) throws IOException {
-        return getFileString(file);
-    }
-
-    private String getFileString(MultipartFile file) throws IOException {
-        if (file != null && !Objects.requireNonNull(file.getOriginalFilename()).isEmpty()) {
-            String resultFilename;
-            File uploadDir = new File(uploadPath);
-
-            if (!uploadDir.exists()) {
-                uploadDir.mkdir();
-            }
-            resultFilename = UUID.randomUUID().toString();
-            file.transferTo(new File(uploadPath + "/images/tracks/" + resultFilename));
-
-            return resultFilename;
-        } else {
-            return Strings.EMPTY;
-        }
-    }
-
-    public String updatePhoto(int id, MultipartFile file) throws IOException {
-        return getFileString(file);
+        return fileHelper.getNewUri(file, FileOperations.TRACK_PHOTO);
     }
 
     public String saveTrack(MultipartFile file) throws IOException {
-        return getFileUriString(file);
-    }
-
-    public String updateTrack(int id, MultipartFile file) throws IOException {
-        return getFileUriString(file);
-    }
-
-    private String getFileUriString(MultipartFile file) throws IOException {
-        if (file != null && !Objects.requireNonNull(file.getOriginalFilename()).isEmpty()) {
-            System.out.println(uploadPath);
-            File uploadDir = new File(uploadPath);
-
-            if (!uploadDir.exists()) {
-                uploadDir.mkdir();
-            }
-
-            String uuidFile = UUID.randomUUID().toString();
-            String resultFilename = uuidFile;
-
-            file.transferTo(new File(uploadPath + "/tracks/" + resultFilename));
-
-            return resultFilename;
-        } else {
-            return Strings.EMPTY;
-        }
+        return fileHelper.getNewUri(file, FileOperations.TRACK_FILE);
     }
 
     public Page<Track> getLastReleases(int pageNum, int pageSize, TrackSort trackSort) {

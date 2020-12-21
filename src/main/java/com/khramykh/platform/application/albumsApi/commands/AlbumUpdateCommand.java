@@ -13,7 +13,7 @@ public class AlbumUpdateCommand {
     private String name;
     private String description;
     private String type;
-    private MultipartFile file;
+    private MultipartFile photoFile;
     private String releaseDate;
     private int[] artists;
 }

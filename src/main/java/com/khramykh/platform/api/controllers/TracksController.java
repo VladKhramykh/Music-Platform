@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -79,19 +80,15 @@ public class TracksController {
         return ResponseEntity.ok().body(TrackTypes.values());
     }
 
-    @PostMapping("/photo")
-    public ResponseEntity setPhoto(@RequestParam int id, @RequestParam(name = "file") MultipartFile file) throws IOException {
-        String photoUrl = tracksService.updatePhoto(id, file);
-        return ResponseEntity.ok().body(photoUrl);
-    }
-
     @DeleteMapping("{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity delete(@PathVariable int id) {
         tracksService.removeById(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity update(
             @RequestParam(name = "id") int id,
             @RequestParam(name = "name") String name,
@@ -122,6 +119,7 @@ public class TracksController {
     }
 
     @PostMapping(produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity create(
             @RequestParam(name = "name") String name,
             @RequestParam(name = "description") String description,
