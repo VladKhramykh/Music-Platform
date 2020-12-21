@@ -4,14 +4,12 @@ import com.khramykh.platform.application.commons.sort.UserSort;
 import com.khramykh.platform.application.usersApi.UsersService;
 import com.khramykh.platform.application.usersApi.commands.UserRegistrationCommand;
 import com.khramykh.platform.application.usersApi.commands.UserUpdateCommand;
-import com.khramykh.platform.domain.commons.enums.Role;
 import com.khramykh.platform.domain.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +26,7 @@ public class UsersController {
     UsersService usersService;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity getUsersByPage(@RequestParam int pageNum, @RequestParam int pageSize, @RequestParam UserSort userSort, @RequestParam(required = false) String searchName) {
         Page<User> page = usersService.getUsersByPage(pageNum, pageSize, userSort);
         return ResponseEntity.ok().body(page);
@@ -58,12 +57,9 @@ public class UsersController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity removeById(@AuthenticationPrincipal User currentUser, @PathVariable int id) {
-        if (currentUser.getId() == id || currentUser.getRoles().contains(Role.ADMIN)) {
-            usersService.removeById(id);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity removeById(@PathVariable int id) {
+        usersService.removeById(id);
+        return ResponseEntity.noContent().build();
     }
 }

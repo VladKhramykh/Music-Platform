@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,7 +24,12 @@ public class ArtistsController {
     ArtistsService artistsService;
 
     @GetMapping("/search")
-    public ResponseEntity getAllByName(@RequestParam String name, @RequestParam int pageNum, @RequestParam int pageSize, @RequestParam ArtistSort artistSort) {
+    public ResponseEntity getAllByName(
+            @RequestParam String name,
+            @RequestParam int pageNum,
+            @RequestParam int pageSize,
+            @RequestParam ArtistSort artistSort
+    ) {
         Page artistsPage = artistsService.getArtistByName(name, pageNum, pageSize, artistSort);
         return ResponseEntity.ok().body(artistsPage);
     }
@@ -53,12 +59,14 @@ public class ArtistsController {
     }
 
     @DeleteMapping("{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity delete(@PathVariable int id) {
         artistsService.removeById(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity update(
             @RequestParam(name = "id") int id,
             @RequestParam(name = "name") String name,
@@ -77,6 +85,7 @@ public class ArtistsController {
     }
 
     @PostMapping(produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity create(
             @RequestParam(name = "name") String name,
             @RequestParam(name = "description") String description,

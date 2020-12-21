@@ -8,6 +8,7 @@ import com.khramykh.platform.domain.entities.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,8 +26,14 @@ public class CategoriesController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity getAll() {
-        List<Category> categories = categoriesService.getCategories();
+    public ResponseEntity getAll(@RequestParam(required = false) String categoryName) {
+        List<Category> categories;
+        if (categoryName != null) {
+            categories = categoriesService.getCategoriesByName(categoryName);
+        } else {
+            categories = categoriesService.getCategories();
+        }
+
         return ResponseEntity.ok().body(categories);
     }
 
@@ -48,25 +55,22 @@ public class CategoriesController {
         return ResponseEntity.ok().build();
     }
 
-//    @GetMapping
-//    public ResponseEntity getOneByName(@RequestParam String name, @RequestParam int pageNum, @RequestParam int pageSize, @RequestParam CategorySort categorySort) {
-//        Page categoryPage = categoriesService.getCategoryByName(name, pageNum, pageSize, categorySort);
-//        return ResponseEntity.ok().body(categoryPage);
-//    }
-
     @DeleteMapping("{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity delete(@PathVariable int id) {
         categoriesService.removeById(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity update(@RequestBody CategoryUpdateCommand command) {
         Category updated = categoriesService.update(command);
         return ResponseEntity.ok().body(updated);
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity create(@RequestBody CategoryCreateCommand command) {
         Category created = categoriesService.create(command);
         return ResponseEntity.ok().body(created);

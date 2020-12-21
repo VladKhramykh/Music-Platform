@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.util.List;
+
 public interface CategoriesRepository extends PagingAndSortingRepository<Category, Integer> {
-    Page<Category> findByNameContaining(String name, Pageable pageable);
+    List<Category> findByNameContaining(String name);
 }

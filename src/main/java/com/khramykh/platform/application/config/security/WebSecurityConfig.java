@@ -2,6 +2,7 @@ package com.khramykh.platform.application.config.security;
 
 import com.khramykh.platform.api.commons.JwtAuthenticationEntryPoint;
 import com.khramykh.platform.api.filters.JwtRequestFilter;
+import com.khramykh.platform.application.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,9 +14,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import static java.lang.String.format;
 
 @Configuration
 @EnableWebSecurity
@@ -27,6 +31,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     UserDetailsService jwtUserDetailsService;
     @Autowired
     JwtRequestFilter jwtRequestFilter;
+    @Autowired
+    UsersRepository usersRepository;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -59,8 +65,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/webjars/**"
         )
                 .permitAll()
-                .anyRequest().permitAll()
-//                .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .and()
@@ -69,4 +73,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
+
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.userDetailsService(username -> usersRepository
+//                .findByEmailIgnoreCase(username)
+//                .orElseThrow(
+//                        () -> new UsernameNotFoundException(
+//                                format("User: %s, not found", username)
+//                        )
+//                ));
+//    }
 }

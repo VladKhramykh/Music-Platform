@@ -163,7 +163,12 @@ public class UsersService {
         oldUser.setFirstName(command.getFirstName());
         oldUser.setLastName(command.getLastName());
         if (!oldUser.getEmail().equals(command.getEmail())) {
-            oldUser.setActivationCode(UUID.randomUUID().toString());
+            if(usersRepository.findByEmailIgnoreCase(command.getEmail()).isEmpty()) {
+                oldUser.setEmail(command.getEmail());
+                oldUser.setActivationCode(UUID.randomUUID().toString());
+            } else {
+                throw new EmailAlreadyInUseException();
+            }
         }
         oldUser.setBirthday(new SimpleDateFormat("yyyy-MM-dd").parse(command.getBirthday()));
         oldUser.setCountry(Country.valueOf(command.getCountry()));
