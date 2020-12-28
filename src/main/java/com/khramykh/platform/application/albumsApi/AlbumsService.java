@@ -9,6 +9,7 @@ import com.khramykh.platform.application.exceptions.ResourceNotFoundException;
 import com.khramykh.platform.application.exceptions.UserNotFoundException;
 import com.khramykh.platform.application.repositories.AlbumsRepository;
 import com.khramykh.platform.application.repositories.ArtistsRepository;
+import com.khramykh.platform.application.repositories.TracksRepository;
 import com.khramykh.platform.application.repositories.UsersRepository;
 import com.khramykh.platform.domain.commons.enums.AlbumTypes;
 import com.khramykh.platform.domain.entities.Album;
@@ -38,6 +39,8 @@ public class AlbumsService {
     AlbumsRepository albumsRepository;
     @Autowired
     ArtistsRepository artistsRepository;
+    @Autowired
+    TracksRepository tracksRepository;
     @Autowired
     UsersRepository usersRepository;
     @Autowired
@@ -69,12 +72,15 @@ public class AlbumsService {
         if (!albumsRepository.existsById(id)) {
             throw new ResourceNotFoundException(id);
         }
+        Album album = albumsRepository.findById(id).get();
+        tracksRepository.deleteAllByAlbum(album);
         albumsRepository.deleteById(id);
     }
 
-    public Album update(AlbumUpdateCommand command) throws ParseException, IOException {
+    public Album update(AlbumUpdateCommand command, String lastModifiedBy) throws ParseException, IOException {
         Album oldAlbum = albumsRepository.findById(command.getId()).orElseThrow(() -> new ResourceNotFoundException((command.getId())));
         Album updated = albumsRepository.save(convertAlbumUpdateCommandToAlbum(oldAlbum, command));
+        updated.setLastModifiedBy(lastModifiedBy);
         return updated;
     }
 
@@ -120,7 +126,7 @@ public class AlbumsService {
         }
     }
 
-    public Album create(AlbumCreateCommand command) throws ParseException, IOException {
+    public Album create(AlbumCreateCommand command, String createdBy) throws ParseException, IOException {
         Album album = new Album();
         album.setName(command.getName());
         album.setType(AlbumTypes.valueOf(command.getType()));
@@ -131,6 +137,8 @@ public class AlbumsService {
             fileHelper.deleteFile(album.getPhotoUri(), FileOperations.ALBUM_PHOTO);
             album.setPhotoUri(fileHelper.getNewUri(command.getPhotoFile(), FileOperations.ALBUM_PHOTO));
         }
+        album.setCreatedBy(createdBy);
+        album.setLastModifiedBy(createdBy);
         album.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse(command.getReleaseDate()));
         album.setDescription(command.getDescription());
         albumsRepository.save(album);

@@ -38,11 +38,6 @@ public class CategoriesService {
         return categoryRepository.findAll(PageRequest.of(pageNum, pageSize, getSortType(categorySort)));
     }
 
-    // TODO need to realize finding top-10 categories
-    public Page<Category> getMostPopularCategoriesByPage(int pageNum, int pageSize, CategorySort categorySort) {
-        return categoryRepository.findAll(PageRequest.of(pageNum, pageSize, getSortType(categorySort)));
-    }
-
     public void removeById(int id) {
         if (!categoryRepository.existsById(id)) {
             throw new ResourceNotFoundException(id);
@@ -50,32 +45,21 @@ public class CategoriesService {
         categoryRepository.deleteById(id);
     }
 
-    public Category update(CategoryUpdateCommand command) {
+    public Category update(CategoryUpdateCommand command, String lastModifiedBy) {
         Category oldCategory = categoryRepository.findById(command.getId()).orElseThrow(() -> new ResourceNotFoundException((command.getId())));
+        oldCategory.setLastModifiedBy(lastModifiedBy);
         Category updated = categoryRepository.save(convertCategoryUpdateCommandToCategory(oldCategory, command));
         return updated;
     }
 
-    public Category create(CategoryCreateCommand command) {
+    public Category create(CategoryCreateCommand command, String createdBy) {
         Category category = new Category();
         category.setName(command.getName());
         category.setDescription(command.getDescription());
+        category.setCreatedBy(createdBy);
+        category.setLastModifiedBy(createdBy);
         categoryRepository.save(category);
         return category;
-    }
-
-    public void like(int categoryId, int userId) {
-        categoryRepository.findById(categoryId).map(category -> {
-            usersRepository.findById(userId).map(user -> category.getLikes().add(user));
-            return categoryRepository.save(category);
-        });
-    }
-
-    public void dislike(int categoryId, int userId) {
-        categoryRepository.findById(categoryId).map(category -> {
-            usersRepository.findById(userId).map(user -> category.getLikes().remove(user));
-            return categoryRepository.save(category);
-        });
     }
 
     private Sort getSortType(CategorySort categorySort) {

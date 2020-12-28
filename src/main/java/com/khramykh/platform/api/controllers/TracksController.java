@@ -105,12 +105,12 @@ public class TracksController {
     @PutMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity update(
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(name = "id") int id,
             @RequestParam(name = "name") String name,
             @RequestParam(name = "description") String description,
             @RequestParam(name = "type") String type,
             @RequestParam(name = "album") Optional<Integer> album,
-            @RequestParam(name = "trackText") String trackText,
             @RequestParam(name = "categories") int[] categories,
             @RequestParam(name = "releaseDate") String releaseDate,
             @RequestParam(name = "artists") int[] artists,
@@ -123,24 +123,23 @@ public class TracksController {
         command.setDescription(description);
         command.setType(type);
         album.ifPresent(command::setAlbum);
-        command.setTrackText(trackText);
         command.setCategories(categories);
         command.setReleaseDate(releaseDate);
         command.setArtists(artists);
         command.setPhotoFile(photoFile);
         command.setTrackFile(trackFile);
-        Track updated = tracksService.update(command);
+        Track updated = tracksService.update(command, userDetails.getUsername());
         return ResponseEntity.ok().body(updated);
     }
 
     @PostMapping(produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity create(
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(name = "name") String name,
             @RequestParam(name = "description") String description,
             @RequestParam(name = "type") String type,
             @RequestParam(name = "album", required = false) Optional<Integer> album,
-            @RequestParam(name = "trackText") String trackText,
             @RequestParam(name = "categories") int[] categories,
             @RequestParam(name = "releaseDate") String releaseDate,
             @RequestParam(name = "artists") int[] artists,
@@ -152,13 +151,12 @@ public class TracksController {
         command.setDescription(description);
         command.setType(type);
         album.ifPresent(command::setAlbum);
-        command.setTrackText(trackText);
         command.setCategories(categories);
         command.setReleaseDate(releaseDate);
         command.setArtists(artists);
         command.setPhotoFile(photoFile);
         command.setTrackFile(trackFile);
-        Track created = tracksService.create(command);
+        Track created = tracksService.create(command, userDetails.getUsername());
         return ResponseEntity.ok().body(created);
     }
 }

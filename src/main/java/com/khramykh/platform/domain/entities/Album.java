@@ -1,11 +1,12 @@
 package com.khramykh.platform.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.khramykh.platform.domain.commons.enums.AlbumTypes;
+import com.khramykh.platform.domain.commons.views.Views;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -19,6 +20,7 @@ import java.util.Set;
 @Entity
 @Table(name = "albums")
 public class Album extends BaseEntity {
+
     private String name;
 
     private String description;
@@ -27,6 +29,7 @@ public class Album extends BaseEntity {
     private AlbumTypes type;
 
     private String photoUri;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date releaseDate;
 

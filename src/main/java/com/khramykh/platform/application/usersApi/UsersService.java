@@ -18,10 +18,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.mail.MailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -29,7 +27,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class UsersService {
@@ -38,9 +35,6 @@ public class UsersService {
 
     @Autowired
     PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private MailSender mailSender;
 
     @Autowired
     FileHelper fileHelper;
@@ -67,9 +61,10 @@ public class UsersService {
         usersRepository.deleteById(id);
     }
 
-    public User update(UserUpdateCommand command) throws ParseException {
+    public User update(UserUpdateCommand command, String lastModifiedBy) throws ParseException {
         User oldUser = usersRepository.findById(command.getId()).orElseThrow(() -> new UserNotFoundException(command.getId()));
         User updated;
+        oldUser.setLastModifiedBy(lastModifiedBy);
         if (command.getPassword().trim().length() > 0) {
             updated = usersRepository.save(convertUserUpdateCommandToUser(oldUser, command, true));
         } else {
@@ -83,7 +78,7 @@ public class UsersService {
         return user.isPresent();
     }
 
-    public User registration(UserRegistrationCommand command) throws ParseException, IOException {
+    public User registration(UserRegistrationCommand command, String createdBy) throws ParseException, IOException {
         if (isExistsByEmail(command.getEmail())) {
             throw new EmailAlreadyInUseException("There is an account with that email adress: " + command.getEmail());
         }
@@ -97,37 +92,10 @@ public class UsersService {
         user.setBirthday(new SimpleDateFormat("yyyy-MM-dd").parse(command.getBirthday().substring(0, 10)));
         user.setGender(UserGender.valueOf(command.getGender()));
         user.setCountry(Country.valueOf(command.getCountry()));
-        user.setActivationCode(UUID.randomUUID().toString());
         user.setHashPassword(passwordEncoder.encode(command.getPassword()));
         user.setRoles(Collections.singleton(Role.USER));
-
-        new Thread(() -> sendActivationCode(user)).start();
-
+        user.setCreatedBy(createdBy);
         return usersRepository.save(user);
-    }
-
-    private void sendActivationCode(User user) {
-        if (!StringUtils.isEmpty(user.getEmail())) {
-            String message = String.format(
-                    "Hello, %s %s \n" +
-                            "Welcome to our music platform. Please, visit next link: http://localhost:8081/activate/%s",
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getActivationCode()
-            );
-            // mailSender.send(user.getEmail(), "Activation Code [no spam]", message);
-        }
-    }
-
-    public boolean activateUser(String code) {
-        Optional<User> user = usersRepository.findUserByActivationCode(code);
-        if (user.isEmpty()) {
-            return false;
-        }
-        user.get().setActivationCode(null);
-        usersRepository.save(user.get());
-
-        return true;
     }
 
     private Sort getSortType(UserSort userSort) {
@@ -173,7 +141,6 @@ public class UsersService {
         if (!oldUser.getEmail().equals(command.getEmail())) {
             if (usersRepository.findByEmailIgnoreCase(command.getEmail()).isEmpty()) {
                 oldUser.setEmail(command.getEmail());
-                oldUser.setActivationCode(UUID.randomUUID().toString());
             } else {
                 throw new EmailAlreadyInUseException();
             }

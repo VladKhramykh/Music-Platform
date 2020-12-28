@@ -24,11 +24,11 @@ public class ApiExceptionsHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleUserNotFoundApiException(UserNotFoundException ex) {
         ApiErrorResponse response = new ApiErrorResponse();
         if (!StringUtils.isEmpty(ex.getEmail())) {
-            response.setMsg("{error.user.byemailnotfound} (" + ex.getEmail() + ")");
+            response.setMsg("User not found. Email (" + ex.getEmail() + ")");
         } else if (ex.getId() <= 0) {
-            response.setMsg("${error.user.byidnotfound} (" + ex.getId() + ")");
+            response.setMsg("User not found. Id (" + ex.getId() + ")");
         } else {
-            response.setMsg("{error.user.notfound}");
+            response.setMsg("User not found");
         }
 
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);

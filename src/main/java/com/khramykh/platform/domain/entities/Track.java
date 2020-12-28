@@ -26,11 +26,8 @@ public class Track extends BaseEntity {
     private String description;
 
     private String photoUri;
+
     private String trackUri;
-
-    private String trackText;
-
-    private boolean published;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date releaseDate;

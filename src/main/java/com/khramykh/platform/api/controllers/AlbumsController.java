@@ -32,7 +32,7 @@ public class AlbumsController {
             @RequestParam(required = false) String filter,
             @RequestParam AlbumSort albumSort) {
         Page<Album> albumsPage;
-        if(filter != null){
+        if (filter != null) {
             albumsPage = albumsService.getAlbumByNameContaining(filter, pageNum, pageSize, albumSort);
         } else {
             albumsPage = albumsService.getAlbumsByPage(pageNum, pageSize, albumSort);
@@ -88,13 +88,16 @@ public class AlbumsController {
     }
 
     @DeleteMapping("{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity delete(@PathVariable int id) {
         albumsService.removeById(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity update(
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(name = "id") int id,
             @RequestParam(name = "name") String name,
             @RequestParam(name = "description") String description,
@@ -111,12 +114,14 @@ public class AlbumsController {
         command.setReleaseDate(releaseDate);
         command.setArtists(artists);
         command.setPhotoFile(photoFile);
-        Album updated = albumsService.update(command);
+        Album updated = albumsService.update(command, userDetails.getUsername());
         return ResponseEntity.ok().body(updated);
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity create(
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(name = "name") String name,
             @RequestParam(name = "description") String description,
             @RequestParam(name = "type") String type,
@@ -131,7 +136,7 @@ public class AlbumsController {
         command.setReleaseDate(releaseDate);
         command.setArtists(artists);
         command.setPhotoFile(photoFile);
-        Album created = albumsService.create(command);
+        Album created = albumsService.create(command, userDetails.getUsername());
         return ResponseEntity.ok().body(created);
     }
 }

@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,7 +36,7 @@ public class UsersController {
             @RequestParam(required = false) String filter
     ) {
         Page<User> page;
-        if(filter != null) {
+        if (filter != null) {
             page = usersService.getUserByFilterContaining(filter, pageNum, pageSize, userSort);
         } else {
             page = usersService.getUsersByPage(pageNum, pageSize, userSort);
@@ -55,14 +57,20 @@ public class UsersController {
     }
 
     @PostMapping
-    public ResponseEntity<User> create(@RequestBody UserRegistrationCommand command) throws ParseException, IOException {
-        User created = usersService.registration(command);
+    public ResponseEntity<User> create(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody UserRegistrationCommand command
+    ) throws ParseException, IOException {
+        User created = usersService.registration(command, userDetails.getUsername());
         return ResponseEntity.ok().body(created);
     }
 
     @PutMapping
-    public ResponseEntity<User> update(@RequestBody UserUpdateCommand command) throws ParseException, IOException {
-        User updated = usersService.update(command);
+    public ResponseEntity<User> update(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody UserUpdateCommand command
+    ) throws ParseException, IOException {
+        User updated = usersService.update(command, userDetails.getUsername());
         return ResponseEntity.ok().body(updated);
     }
 

@@ -1,13 +1,12 @@
 package com.khramykh.platform.application.config;
 
-import org.hibernate.dialect.SQLServerDialect;
 import org.hibernate.type.StandardBasicTypes;
 import org.springframework.stereotype.Component;
 
 import java.sql.Types;
 
 @Component
-public class SQLServerUnicodeDialect extends org.hibernate.dialect.SQLServerDialect {
+public class SQLServerUnicodeDialect extends org.hibernate.dialect.SQLServer2012Dialect {
     public SQLServerUnicodeDialect() {
         super();
         registerColumnType(Types.CHAR, "nchar(1)");

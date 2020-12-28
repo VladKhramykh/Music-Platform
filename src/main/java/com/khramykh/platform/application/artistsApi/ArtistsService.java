@@ -6,7 +6,9 @@ import com.khramykh.platform.application.commons.sort.ArtistSort;
 import com.khramykh.platform.application.commons.utils.FileHelper;
 import com.khramykh.platform.application.commons.utils.FileOperations;
 import com.khramykh.platform.application.exceptions.ResourceNotFoundException;
+import com.khramykh.platform.application.repositories.AlbumsRepository;
 import com.khramykh.platform.application.repositories.ArtistsRepository;
+import com.khramykh.platform.application.repositories.TracksRepository;
 import com.khramykh.platform.application.repositories.UsersRepository;
 import com.khramykh.platform.domain.entities.Artist;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,10 @@ public class ArtistsService {
     @Autowired
     ArtistsRepository artistsRepository;
     @Autowired
+    AlbumsRepository albumsRepository;
+    @Autowired
+    TracksRepository tracksRepository;
+    @Autowired
     UsersRepository usersRepository;
     @Autowired
     FileHelper fileHelper;
@@ -41,25 +47,24 @@ public class ArtistsService {
         return artistsRepository.findAll(PageRequest.of(pageNum, pageSize, getSortType(artistSort)));
     }
 
-    // TODO need to realize finding top-10 artists
-    public Page<Artist> getMostPopularArtistsByPage(int pageNum, int pageSize, ArtistSort artistSort) {
-        return artistsRepository.findAll(PageRequest.of(pageNum, pageSize, getSortType(artistSort)));
-    }
-
     public void removeById(int id) {
         if (!artistsRepository.existsById(id)) {
             throw new ResourceNotFoundException(id);
         }
+        Artist artist = artistsRepository.findById(id).get();
+        tracksRepository.deleteAllByArtistsContains(artist);
+        albumsRepository.deleteAllByArtistsContains(artist);
         artistsRepository.deleteById(id);
     }
 
-    public Artist update(ArtistUpdateCommand command) throws ParseException, IOException {
+    public Artist update(ArtistUpdateCommand command, String lastModifiedBy) throws ParseException, IOException {
         Artist oldArtist = artistsRepository.findById(command.getId()).orElseThrow(() -> new ResourceNotFoundException((command.getId())));
         Artist updated = artistsRepository.save(convertArtistUpdateCommandToArtist(oldArtist, command));
+        updated.setLastModifiedBy(lastModifiedBy);
         return updated;
     }
 
-    public Artist create(ArtistCreateCommand command) throws ParseException, IOException {
+    public Artist create(ArtistCreateCommand command, String createdBy) throws ParseException, IOException {
         Artist artist = new Artist();
         artist.setName(command.getName());
         artist.setDescription(command.getDescription());
@@ -67,6 +72,8 @@ public class ArtistsService {
             artist.setPhotoUri(fileHelper.getNewUri(command.getPhotoFile(), FileOperations.ARTIST_PHOTO));
         }
         artist.setCreatedDate(new SimpleDateFormat("yyyy-MM-dd").parse(command.getCreatedDate()));
+        artist.setCreatedBy(createdBy);
+        artist.setLastModifiedBy(createdBy);
         artistsRepository.save(artist);
         return artist;
     }
@@ -102,19 +109,5 @@ public class ArtistsService {
             oldArtist.setPhotoUri(fileHelper.getNewUri(command.getPhotoFile(), FileOperations.ARTIST_PHOTO));
         }
         return oldArtist;
-    }
-
-    public void like(int artistId, int userId) {
-        artistsRepository.findById(artistId).map(artist -> {
-            usersRepository.findById(userId).map(user -> artist.getLikes().add(user));
-            return artistsRepository.save(artist);
-        });
-    }
-
-    public void dislike(int artistId, int userId) {
-        artistsRepository.findById(artistId).map(artist -> {
-            usersRepository.findById(userId).map(user -> artist.getLikes().remove(user));
-            return artistsRepository.save(artist);
-        });
     }
 }

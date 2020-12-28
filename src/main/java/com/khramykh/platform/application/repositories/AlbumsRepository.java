@@ -6,7 +6,9 @@ import com.khramykh.platform.domain.entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,4 +23,7 @@ public interface AlbumsRepository extends PagingAndSortingRepository<Album, Inte
     Page<Album> findByOrderByReleaseDateDesc(Pageable page);
 
     Page<Album> findAllByLikesContains(User user, Pageable pageable);
+
+    @Transactional
+    void deleteAllByArtistsContains(Artist artist);
 }

@@ -32,8 +32,6 @@ public class User extends BaseEntity {
     @NotEmpty(message = "{user.lastnamenotempty}")
     private String lastName;
 
-    private String activationCode;
-
     @Email(message = "{user.incorrectemail}")
     @NotNull(message = "{user.emailnotnull}")
     @NotEmpty(message = "{user.emailnotempty}")

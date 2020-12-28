@@ -5,11 +5,14 @@ import com.khramykh.platform.application.artistsApi.commands.ArtistCreateCommand
 import com.khramykh.platform.application.artistsApi.commands.ArtistUpdateCommand;
 import com.khramykh.platform.application.commons.sort.ArtistSort;
 import com.khramykh.platform.domain.entities.Artist;
+import org.dom4j.util.UserDataAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,18 +47,6 @@ public class ArtistsController {
         return ResponseEntity.ok().body(artist);
     }
 
-    @GetMapping("/like")
-    public ResponseEntity like(@RequestParam int trackId, @RequestParam int userId) {
-        artistsService.like(trackId, userId);
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/dislike")
-    public ResponseEntity dislike(@RequestParam int trackId, @RequestParam int userId) {
-        artistsService.dislike(trackId, userId);
-        return ResponseEntity.ok().build();
-    }
-
     @DeleteMapping("{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity delete(@PathVariable int id) {
@@ -66,6 +57,7 @@ public class ArtistsController {
     @PutMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity update(
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(name = "id") int id,
             @RequestParam(name = "name") String name,
             @RequestParam(name = "description") String description,
@@ -78,13 +70,14 @@ public class ArtistsController {
         command.setDescription(description);
         command.setCreatedDate(createdDate);
         command.setPhotoFile(photoFile);
-        Artist updated = artistsService.update(command);
+        Artist updated = artistsService.update(command, userDetails.getUsername());
         return ResponseEntity.ok().body(updated);
     }
 
     @PostMapping(produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity create(
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(name = "name") String name,
             @RequestParam(name = "description") String description,
             @RequestParam(name = "createdDate") String createdDate,
@@ -95,7 +88,7 @@ public class ArtistsController {
         command.setDescription(description);
         command.setCreatedDate(createdDate);
         command.setPhotoFile(photoFile);
-        Artist created = artistsService.create(command);
+        Artist created = artistsService.create(command, userDetails.getUsername());
         return ResponseEntity.ok().body(created);
     }
 }

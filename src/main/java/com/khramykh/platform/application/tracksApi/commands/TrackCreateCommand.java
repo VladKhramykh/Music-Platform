@@ -15,7 +15,6 @@ public class TrackCreateCommand {
     private String releaseDate;
     private MultipartFile photoFile;
     private MultipartFile trackFile;
-    private String trackText;
     private int[] categories;
     private int album;
     private int[] artists;

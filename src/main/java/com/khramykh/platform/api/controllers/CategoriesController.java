@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -52,18 +54,6 @@ public class CategoriesController {
         return ResponseEntity.ok().body(categoryPage);
     }
 
-    @GetMapping("/like")
-    public ResponseEntity like(@RequestParam int trackId, @RequestParam int userId) {
-        categoriesService.like(trackId, userId);
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/dislike")
-    public ResponseEntity dislike(@RequestParam int trackId, @RequestParam int userId) {
-        categoriesService.dislike(trackId, userId);
-        return ResponseEntity.ok().build();
-    }
-
     @DeleteMapping("{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity delete(@PathVariable int id) {
@@ -73,15 +63,15 @@ public class CategoriesController {
 
     @PutMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity update(@RequestBody CategoryUpdateCommand command) {
-        Category updated = categoriesService.update(command);
+    public ResponseEntity update(@AuthenticationPrincipal UserDetails userDetails, @RequestBody CategoryUpdateCommand command) {
+        Category updated = categoriesService.update(command, userDetails.getUsername());
         return ResponseEntity.ok().body(updated);
     }
 
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity create(@RequestBody CategoryCreateCommand command) {
-        Category created = categoriesService.create(command);
+    public ResponseEntity create(@AuthenticationPrincipal UserDetails userDetails, @RequestBody CategoryCreateCommand command) {
+        Category created = categoriesService.create(command, userDetails.getUsername());
         return ResponseEntity.ok().body(created);
     }
 }

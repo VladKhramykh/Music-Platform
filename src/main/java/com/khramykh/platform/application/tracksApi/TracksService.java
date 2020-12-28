@@ -12,7 +12,6 @@ import com.khramykh.platform.domain.commons.enums.TrackTypes;
 import com.khramykh.platform.domain.entities.Artist;
 import com.khramykh.platform.domain.entities.Track;
 import com.khramykh.platform.domain.entities.User;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -21,14 +20,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 @Service
 public class TracksService {
@@ -69,11 +65,6 @@ public class TracksService {
         return tracksRepository.findByAlbum_Id(albumID);
     }
 
-    // TODO need to realize finding top-10 categories
-    public Page<Track> getMostPopularTracksByPage(int pageNum, int pageSize, TrackSort trackSort) {
-        return tracksRepository.findAll(PageRequest.of(pageNum, pageSize, getSortType(trackSort)));
-    }
-
     public void removeById(int id) {
         if (!tracksRepository.existsById(id)) {
             throw new ResourceNotFoundException(id);
@@ -81,9 +72,10 @@ public class TracksService {
         tracksRepository.deleteById(id);
     }
 
-    public Track update(TrackUpdateCommand command) throws IOException, ParseException {
+    public Track update(TrackUpdateCommand command, String lastModifiedBy) throws IOException, ParseException {
         Track track = tracksRepository.findById(command.getId()).orElseThrow(ResourceNotFoundException::new);
         track.setName(command.getName());
+        track.setLastModifiedBy(lastModifiedBy);
         track.setDescription(command.getDescription());
         track.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse(command.getReleaseDate()));
 
@@ -105,7 +97,6 @@ public class TracksService {
             track.setTrackUri(fileHelper.getNewUri(command.getTrackFile(), FileOperations.TRACK_FILE));
             track.setTrackUri(saveTrack(command.getTrackFile()));
         }
-        // track.setTrackText(command.getTrackText());
         track.setType(TrackTypes.valueOf(command.getType()));
         if (track.getType().equals(TrackTypes.MUSIC_TRACK_SINGLE)) {
             track.setAlbum(null);
@@ -115,9 +106,11 @@ public class TracksService {
         return updated;
     }
 
-    public Track create(TrackCreateCommand command) throws IOException, ParseException {
+    public Track create(TrackCreateCommand command, String createdBy) throws IOException, ParseException {
         Track track = new Track();
         track.setName(command.getName());
+        track.setCreatedBy(createdBy);
+        track.setLastModifiedBy(createdBy);
         track.setDescription(command.getDescription());
         track.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd").parse(command.getReleaseDate()));
 
@@ -136,7 +129,6 @@ public class TracksService {
         if (command.getTrackFile() != null) {
             track.setTrackUri(fileHelper.getNewUri(command.getTrackFile(), FileOperations.TRACK_FILE));
         }
-        track.setTrackText(command.getTrackText());
         track.setType(TrackTypes.valueOf(command.getType()));
         tracksRepository.save(track);
         return track;
@@ -189,16 +181,12 @@ public class TracksService {
         });
     }
 
-    public String savePhoto(MultipartFile file) throws IOException {
-        return fileHelper.getNewUri(file, FileOperations.TRACK_PHOTO);
-    }
-
     public String saveTrack(MultipartFile file) throws IOException {
         return fileHelper.getNewUri(file, FileOperations.TRACK_FILE);
     }
 
     public Page<Track> getLastReleases(int pageNum, int pageSize, TrackSort trackSort) {
-        return this.tracksRepository.findAllByOrderByCreatedDateDesc(PageRequest.of(pageNum, pageSize, getSortType(trackSort)));
+        return this.tracksRepository.findByOrderByReleaseDateDesc(PageRequest.of(pageNum, pageSize));
     }
 
     public Page<Track> getFavouriteTracksByUser(String username, int pageNum, int pageSize, TrackSort trackSort) {
